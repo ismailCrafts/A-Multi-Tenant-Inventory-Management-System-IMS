@@ -40,3 +40,5 @@ locale/
 
 # Fonts
 *.woff2
+
+/images/
