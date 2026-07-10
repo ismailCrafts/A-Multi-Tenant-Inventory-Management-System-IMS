@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{{ pr.return_code }} — {% trans "Purchase Return" %}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><span class="header-icon"><i class="fas fa-undo-alt"></i></span>{{ pr.return_code }}</h1>
+</div>
+<div class="ims-card mb-4">
+  <div class="ims-card-header"><h4>{% trans "Return Details" %}</h4></div>
+  <div class="ims-card-body">
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">{% trans "Date" %}</div><div class="info-value">{{ pr.date|date:"Y-m-d" }}</div></div>
+      <div class="info-item"><div class="info-label">{% trans "Return Code" %}</div><div class="info-value mono">{{ pr.return_code }}</div></div>
+      <div class="info-item"><div class="info-label">{% trans "Supplier" %}</div><div class="info-value">{{ pr.supplier_name }}</div></div>
+      <div class="info-item"><div class="info-label">{% trans "Mobile" %}</div><div class="info-value">{{ pr.supplier_mobile|default:"—" }}</div></div>
+      <div class="info-item"><div class="info-label">{% trans "Address" %}</div><div class="info-value">{{ pr.supplier_address|default:"—" }}</div></div>
+      <div class="info-item"><div class="info-label">{% trans "Narration" %}</div><div class="info-value">{{ pr.narration|default:"—" }}</div></div>
+      <div class="info-item"><div class="info-label">{% trans "Total" %}</div><div class="info-value fw-semibold">{{ pr.total_amount|floatformat:"-2" }}৳</div></div>
+      <div class="info-item"><div class="info-label">{% trans "Refund" %}</div><div class="info-value" style="color:var(--clr-success)">{{ pr.refund_amount|floatformat:"-2" }}৳</div></div>
+      <div class="info-item"><div class="info-label">{% trans "Due" %}</div><div class="info-value" style="color:var(--clr-danger)">{{ pr.due_amount|floatformat:"-2" }}৳</div></div>
+
+      {# Created timestamp and creator #}
+      <div class="info-item">
+        <div class="info-label">{% trans "Created" %}</div>
+        <div class="info-value text-muted">
+          {% if pr.created_at %}
+            {{ pr.created_at|date:"M d, Y" }}
+          {% else %}
+            —
+          {% endif %}
+          {% if pr.created_by %}
+            &nbsp;·&nbsp;
+            <strong>{{ pr.created_by.get_full_name|default:pr.created_by.username }}</strong>
+          {% endif %}
+        </div>
+      </div>
+
+      {# Single sentence: show last updated at (date only) by (user) if updated, otherwise show created at/by #}
+      <div class="info-item">
+        <div class="info-label">{% trans "Record" %}</div>
+        <div class="info-value text-muted">
+          {% if pr.updated_at or pr.updated_by %}
+            {% trans "Last updated at" %} 
+            {% if pr.updated_at %}
+              {{ pr.updated_at|date:"M d, Y" }}
+            {% else %}
+              —
+            {% endif %}
+            {% if pr.updated_by %}
+              &nbsp;{% trans "by" %}&nbsp;<strong>{{ pr.updated_by.get_full_name|default:pr.updated_by.username }}</strong>
+            {% endif %}
+          {% else %}
+            {% trans "Created at" %} 
+            {% if pr.created_at %}
+              {{ pr.created_at|date:"M d, Y" }}
+            {% else %}
+              —
+            {% endif %}
+            {% if pr.created_by %}
+              &nbsp;{% trans "by" %}&nbsp;<strong>{{ pr.created_by.get_full_name|default:pr.created_by.username }}</strong>
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<div class="ims-card">
+  <div class="ims-card-header"><h4>{% trans "Items" %}</h4></div>
+  <div class="ims-table-wrap">
+    <table class="table table-hover">
+      <thead><tr>
+        <th style="width:48px">#</th>
+        <th>{% trans "Product" %}</th>
+        <th>{% trans "Category" %}</th>
+        <th>{% trans "Brand" %}</th>
+        <th class="text-end">{% trans "Qty" %}</th>
+        <th class="text-end">{% trans "Unit Price" %}</th>
+        <th class="text-end">{% trans "Subtotal" %}</th>
+      </tr></thead>
+      <tbody>
+        {% for item in pr.items.all %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ item.product.name }}</td>
+          <td>{{ item.category.name }}</td>
+          <td>{{ item.brand.name }}</td>
+          <td class="text-end">{{ item.quantity|floatformat:"0" }}</td>
+          <td class="text-end">{{ item.unit_price|floatformat:"-2" }}৳</td>
+          <td class="text-end">{{ item.subtotal|floatformat:"-2" }}৳</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="ims-card-footer">
+    <a href="{% url 'view_purchase_return' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> {% trans "Back" %}</a>
+  </div>
+</div>
+{% endblock %}

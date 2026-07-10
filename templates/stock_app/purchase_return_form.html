@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Purchase Return" %}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3 class="mb-3">{% trans "Purchase Return" %}</h3>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label>{% trans "Return Code" %}</label>
+                <input type="text" name="return_code" class="form-control" value="{{ generated_code }}" readonly>
+            </div>
+            <div class="col-md-8">
+                <label>{% trans "Linked Purchase" %}</label>
+                <select name="purchase" class="form-select">
+                    <option value="">{% trans "-- Select Purchase --" %}</option>
+                    {% for purchase in purchases %}
+                    <option value="{{ purchase.id }}">{{ purchase.purchase_code }} - {{ purchase.supplier_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label>{% trans "Narration" %}</label>
+            <textarea name="narration" class="form-control"></textarea>
+        </div>
+
+        <hr>
+        <h5>{% trans "Returned Items" %}</h5>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>{% trans "Product" %}</th>
+                    <th>{% trans "Qty" %}</th>
+                    <th>{% trans "Reason" %}</th>
+                </tr>
+            </thead>
+            <tbody id="items-table">
+                <tr>
+                    <td><input type="text" name="product_1" class="form-control"></td>
+                    <td><input type="number" name="qty_1" class="form-control"></td>
+                    <td><input type="text" name="reason_1" class="form-control"></td>
+                </tr>
+            </tbody>
+        </table>
+        <button type="button" class="btn btn-sm btn-secondary" id="add-row">+ {% trans "Add Item" %}</button>
+
+        <div class="text-end mt-4">
+            <button type="submit" class="btn btn-primary">{% trans "Save Return" %}</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

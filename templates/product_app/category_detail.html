@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{{ category.name }} — {% trans "Category" %}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><span class="header-icon"><i class="fas fa-th-large"></i></span>{{ category.name }}</h1>
+</div>
+<div class="ims-card" style="max-width:640px">
+  <div class="ims-card-header"><h4>{% trans "Category Details" %}</h4></div>
+  <div class="ims-card-body">
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">{% trans "Name" %}</div><div class="info-value">{{ category.name }}</div></div>
+      <div class="info-item" style="grid-column:1/-1"><div class="info-label">{% trans "Description" %}</div><div class="info-value">{{ category.description|default:"—" }}</div></div>
+
+      {# Created timestamp and creator #}
+      <div class="info-item">
+        <div class="info-label">{% trans "Created" %}</div>
+        <div class="info-value text-muted">
+          {% if category.created_at %}
+            {{ category.created_at|date:"M d, Y H:i" }}
+          {% else %}
+            —
+          {% endif %}
+          {% if category.created_by %}
+            &nbsp;·&nbsp;
+            <strong>{{ category.created_by.get_full_name|default:category.created_by.username }}</strong>
+          {% endif %}
+        </div>
+      </div>
+
+      {# Single sentence: show last updated at (time) by (user) if updated, otherwise show created at/by #}
+      <div class="info-item">
+        <div class="info-label">{% trans "Record" %}</div>
+        <div class="info-value text-muted">
+          {% if category.updated_at or category.updated_by %}
+            {% trans "Last updated at" %} 
+            {% if category.updated_at %}
+              {{ category.updated_at|date:"M d, Y" }}
+            {% else %}
+              —
+            {% endif %}
+            {% if category.updated_by %}
+              &nbsp;{% trans "by" %}&nbsp;<strong>{{ category.updated_by.get_full_name|default:category.updated_by.username }}</strong>
+            {% endif %}
+          {% else %}
+            {% trans "Created at" %} 
+            {% if category.created_at %}
+              {{ category.created_at|date:"M d, Y" }}
+            {% else %}
+              —
+            {% endif %}
+            {% if category.created_by %}
+              &nbsp;{% trans "by" %}&nbsp;<strong>{{ category.created_by.get_full_name|default:category.created_by.username }}</strong>
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="ims-card-footer">
+    <a href="{% url 'update_category' category.name %}" class="btn btn-warning"><i class="fas fa-pen"></i> {% trans "Update" %}</a>
+    <a href="{% url 'delete_category' category.name %}" class="btn btn-danger" onclick="return confirm('{% trans "Delete this category?" %}')"><i class="fas fa-trash"></i> {% trans "Delete" %}</a>
+    <a href="{% url 'view_category' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> {% trans "Back" %}</a>
+  </div>
+</div>
+{% endblock %}

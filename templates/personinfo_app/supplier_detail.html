@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{{ supplier.name }} — {% trans "Supplier" %}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1><span class="header-icon"><i class="fas fa-truck"></i></span>{{ supplier.name }}</h1>
+</div>
+<div class="ims-card" style="max-width:700px">
+    <div class="ims-card-header">
+        <h4>{% trans "Supplier Details" %}</h4>
+        <span class="badge bg-secondary text-mono">{{ supplier.code }}</span>
+    </div>
+    <div class="ims-card-body">
+        <div class="info-grid">
+            <div class="info-item"><div class="info-label">{% trans "Name" %}</div><div class="info-value">{{ supplier.name }}</div></div>
+            <div class="info-item"><div class="info-label">{% trans "Code" %}</div><div class="info-value mono">{{ supplier.code }}</div></div>
+            <div class="info-item"><div class="info-label">{% trans "Mobile" %}</div><div class="info-value">{{ supplier.mobile }}</div></div>
+            <div class="info-item"><div class="info-label">{% trans "Email" %}</div><div class="info-value">{{ supplier.email|default:"—" }}</div></div>
+            <div class="info-item"><div class="info-label">{% trans "Address" %}</div><div class="info-value">{{ supplier.address|default:"—" }}</div></div>
+            {% if supplier.branch %}<div class="info-item"><div class="info-label">{% trans "Branch" %}</div><div class="info-value">{{ supplier.branch.name }}</div></div>{% endif %}
+            <div class="info-item"><div class="info-label">{% trans "Organization" %}</div><div class="info-value">{{ supplier.organization.name }}</div></div>
+
+            {# Created timestamp and creator #}
+            <div class="info-item">
+                <div class="info-label">{% trans "Created" %}</div>
+                <div class="info-value text-muted">
+                    {% if supplier.created_at %}
+                        {{ supplier.created_at|date:"SHORT_DATETIME_FORMAT" }}
+                    {% else %}
+                        —
+                    {% endif %}
+                    {% if supplier.created_by %}
+                        &nbsp;·&nbsp;
+                        <strong>{{ supplier.created_by.get_full_name|default:supplier.created_by.username }}</strong>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# Single sentence: show last updated at (time) by (user) if updated, otherwise show created at/by #}
+            <div class="info-item">
+                <div class="info-label">{% trans "Record" %}</div>
+                <div class="info-value text-muted">
+                    {% if supplier.updated_at or supplier.updated_by %}
+                        {% trans "Last updated at" %} 
+                        {% if supplier.updated_at %}
+                            {{ supplier.updated_at|date:"SHORT_DATETIME_FORMAT" }}
+                        {% else %}
+                            —
+                        {% endif %}
+                        {% if supplier.updated_by %}
+                            &nbsp;{% trans "by" %}&nbsp;<strong>{{ supplier.updated_by.get_full_name|default:supplier.updated_by.username }}</strong>
+                        {% endif %}
+                    {% else %}
+                        {% trans "Created at" %} 
+                        {% if supplier.created_at %}
+                            {{ supplier.created_at|date:"SHORT_DATETIME_FORMAT" }}
+                        {% else %}
+                            —
+                        {% endif %}
+                        {% if supplier.created_by %}
+                            &nbsp;{% trans "by" %}&nbsp;<strong>{{ supplier.created_by.get_full_name|default:supplier.created_by.username }}</strong>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="ims-card-footer">
+        <a href="{% url 'supplier_update' supplier.pk %}" class="btn btn-warning"><i class="fas fa-pen"></i> {% trans "Edit" %}</a>
+        <form method="POST" action="{% url 'supplier_detail' supplier.pk %}" style="display:inline">
+            {% csrf_token %}
+            <button type="submit" name="delete" class="btn btn-danger" onclick="return confirm('{% blocktrans %}Delete this supplier?{% endblocktrans %}')">
+                <i class="fas fa-trash"></i> {% trans "Delete" %}
+            </button>
+        </form>
+        <a href="{% url 'supplier_list' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> {% trans "Back" %}</a>
+    </div>
+</div>
+{% endblock %}

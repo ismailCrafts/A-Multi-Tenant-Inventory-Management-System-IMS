@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Product Rejection" %}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3 class="mb-3">{% trans "Reject Product (Supplier Side)" %}</h3>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label>{% trans "Product" %}</label>
+                <select name="product" class="form-select">
+                    {% for product in products %}
+                    <option value="{{ product.id }}">{{ product.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label>{% trans "Quantity" %}</label>
+                <input type="number" step="0.01" name="quantity" class="form-control" required>
+            </div>
+            <div class="col-md-3">
+                <label>{% trans "Reason" %}</label>
+                <select name="reason" class="form-select">
+                    <option value="damaged">{% trans "Damaged" %}</option>
+                    <option value="expired">{% trans "Expired" %}</option>
+                    <option value="defective">{% trans "Defective" %}</option>
+                    <option value="contaminated">{% trans "Contaminated" %}</option>
+                    <option value="other">{% trans "Other" %}</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label>{% trans "Linked Purchase (optional)" %}</label>
+            <select name="purchase" class="form-select">
+                <option value="">{% trans "-- Select Purchase --" %}</option>
+                {% for purchase in purchases %}
+                <option value="{{ purchase.id }}">{{ purchase.purchase_code }} - {{ purchase.supplier_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label>{% trans "Narration" %}</label>
+            <textarea name="narration" class="form-control"></textarea>
+        </div>
+
+        <div class="text-end mt-4">
+            <button type="submit" class="btn btn-danger">{% trans "Submit Rejection" %}</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

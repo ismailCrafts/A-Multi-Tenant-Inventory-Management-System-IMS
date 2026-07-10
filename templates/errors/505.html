@@ -1,0 +1,49 @@
+{% load i18n static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{% trans "505 — HTTP Version Not Supported" %}</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',-apple-system,sans-serif;background:#f8fafc;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;color:#1e293b}
+    .card{background:#fff;border:1px solid #e2e8f0;border-radius:20px;padding:40px 32px;text-align:center;max-width:560px;width:100%;box-shadow:0 8px 30px rgba(15,23,42,.08)}
+    .icon{width:72px;height:72px;border-radius:50%;background:#fff7ed;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:1.75rem;color:#d97706}
+    .code{font-size:4rem;font-weight:700;color:#d97706;line-height:1;margin-bottom:8px;letter-spacing:-0.03em}
+    .title{font-size:1.25rem;font-weight:600;color:#0f172a;margin-bottom:10px}
+    .desc{color:#64748b;font-size:0.9rem;margin-bottom:16px;line-height:1.6}
+    .info-box{background:#fffbeb;border-left:3px solid #f59e0b;border-radius:8px;padding:14px 16px;text-align:left;margin-bottom:24px}
+    .info-box p{color:#92400e;font-size:0.875rem;line-height:1.5}
+    .technical{font-family:monospace;font-size:0.8rem;background:#f1f5f9;padding:8px 12px;border-radius:6px;color:#475569;margin-top:8px}
+    .actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+    .btn-p{background:#f59e0b;color:#fff;border:none;border-radius:10px;padding:11px 22px;font-weight:600;font-size:0.875rem;cursor:pointer;transition:all .15s}
+    .btn-p:hover{background:#d97706;transform:translateY(-1px)}
+    .btn-s{background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;border-radius:10px;padding:11px 22px;font-weight:600;font-size:0.875rem;text-decoration:none;cursor:pointer;transition:all .15s}
+    .meta{margin-top:24px;padding-top:16px;border-top:1px solid #e2e8f0;font-size:0.78rem;color:#94a3b8}
+    @media(max-width:480px){.code{font-size:3rem}.actions{flex-direction:column}.btn-p,.btn-s{width:100%;text-align:center}}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon"><i class="fas fa-triangle-exclamation"></i></div>
+    <div class="code">505</div>
+    <h1 class="title">{% trans "HTTP Version Not Supported" %}</h1>
+    <p class="desc">{% trans "The server does not support the HTTP protocol version used in your request." %}</p>
+    <div class="info-box">
+      <p>{% trans "This is typically a server-side configuration issue. Try refreshing or contact the administrator with reference" %} <strong>{{ cid|default:"—" }}</strong>.</p>
+      <div class="technical">{{ server_info|default:"HTTP/2.0 not supported by this server" }}</div>
+    </div>
+    <div class="actions">
+      <button onclick="window.location.reload()" class="btn-p">{% trans "Refresh Page" %}</button>
+      <a href="{% url 'home' %}" class="btn-s">{% trans "Go to Homepage" %}</a>
+    </div>
+    <div class="meta">
+      {% trans "Error" %} 505 &bull; {% trans "Request ID" %}: <strong>{{ request_id|default:"N/A" }}</strong>
+      {% if support_email %} &bull; <a href="mailto:{{ support_email }}" style="color:#f59e0b">{{ support_email }}</a>{% endif %}
+    </div>
+  </div>
+</body>
+</html>

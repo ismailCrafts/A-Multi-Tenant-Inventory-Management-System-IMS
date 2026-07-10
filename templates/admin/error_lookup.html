@@ -1,0 +1,26 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+  <h1>Error Lookup</h1>
+
+  <form method="get" style="margin-bottom:20px;">
+    <label for="cid">Enter Correlation ID:</label>
+    <input type="text" name="cid" id="cid" value="{{ cid }}" style="width:250px;">
+    <button type="submit" class="button">Search</button>
+  </form>
+
+  {% if record %}
+    <h2>Diagnostics for Correlation ID: {{ cid }}</h2>
+    <table class="admin-table" style="width:100%; border-collapse: collapse;">
+      <tr><th>Path</th><td>{{ record.path }}</td></tr>
+      <tr><th>Method</th><td>{{ record.method }}</td></tr>
+      <tr><th>User</th><td>{{ record.user }}</td></tr>
+      <tr><th>IP Address</th><td>{{ record.ip }}</td></tr>
+      <tr><th>User Agent</th><td>{{ record.headers.User_Agent }}</td></tr>
+      <tr><th>Referer</th><td>{{ record.headers.Referer }}</td></tr>
+      <tr><th>Traceback</th><td><pre>{{ record.traceback }}</pre></td></tr>
+    </table>
+  {% elif cid %}
+    <p>No record found for correlation ID <strong>{{ cid }}</strong>.</p>
+  {% endif %}
+{% endblock %}

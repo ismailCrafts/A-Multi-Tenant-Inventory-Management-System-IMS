@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{{ product.name }} — IMS{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><span class="header-icon"><i class="fas fa-box"></i></span>{{ product.name }}</h1>
+</div>
+<div class="row g-4">
+  <div class="col-md-8">
+    <div class="ims-card">
+      <div class="ims-card-header"><h4>{% trans "Product Information" %}</h4></div>
+      <div class="ims-card-body">
+        <div class="info-grid">
+          <div class="info-item"><div class="info-label">{% trans "Code" %}</div><div class="info-value mono">{{ product.code }}</div></div>
+          <div class="info-item"><div class="info-label">{% trans "Category" %}</div><div class="info-value">{{ product.category.name }}</div></div>
+          <div class="info-item"><div class="info-label">{% trans "Brand" %}</div><div class="info-value">{{ product.brand.name }}</div></div>
+          <div class="info-item"><div class="info-label">{% trans "Product Group" %}</div><div class="info-value">{{ product.product_group.name }}</div></div>
+          <div class="info-item" style="grid-column:1/-1"><div class="info-label">{% trans "Description" %}</div><div class="info-value">{{ product.description|default:"—" }}</div></div>
+
+          {# Created timestamp and creator #}
+          <div class="info-item">
+            <div class="info-label">{% trans "Created" %}</div>
+            <div class="info-value text-muted">
+              {% if product.created_at %}
+                {{ product.created_at|date:"M d, Y" }}
+              {% else %}
+                —
+              {% endif %}
+              {% if product.created_by %}
+                &nbsp;·&nbsp;
+                <strong>{{ product.created_by.get_full_name|default:product.created_by.username }}</strong>
+              {% endif %}
+            </div>
+          </div>
+
+          {# Single sentence: show last updated at (date only) by (user) if updated, otherwise show created at/by #}
+          <div class="info-item">
+            <div class="info-label">{% trans "Record" %}</div>
+            <div class="info-value text-muted">
+              {% if product.updated_at or product.updated_by %}
+                {% trans "Last updated at" %} 
+                {% if product.updated_at %}
+                  {{ product.updated_at|date:"M d, Y" }}
+                {% else %}
+                  —
+                {% endif %}
+                {% if product.updated_by %}
+                  &nbsp;{% trans "by" %}&nbsp;<strong>{{ product.updated_by.get_full_name|default:product.updated_by.username }}</strong>
+                {% endif %}
+              {% else %}
+                {% trans "Created at" %} 
+                {% if product.created_at %}
+                  {{ product.created_at|date:"M d, Y" }}
+                {% else %}
+                  —
+                {% endif %}
+                {% if product.created_by %}
+                  &nbsp;{% trans "by" %}&nbsp;<strong>{{ product.created_by.get_full_name|default:product.created_by.username }}</strong>
+                {% endif %}
+              {% endif %}
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <div class="ims-card-footer">
+        <a href="{% url 'update_product' product.name %}" class="btn btn-warning"><i class="fas fa-pen"></i> {% trans "Update" %}</a>
+        <a href="{% url 'delete_product' product.name %}" class="btn btn-danger" onclick="return confirm('{% trans "Delete this product?" %}')"><i class="fas fa-trash"></i> {% trans "Delete" %}</a>
+        <a href="{% url 'view_product' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> {% trans "Back" %}</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="ims-card">
+      <div class="ims-card-header"><h4>{% trans "Barcode & Stock" %}</h4></div>
+      <div class="ims-card-body text-center">
+        <div class="info-label mb-2">{% trans "Barcode" %}</div>
+        <div class="info-value mono mb-3">{{ product.barcode_number|default:"—" }}</div>
+        {% if product.barcode_image %}
+          <img src="{{ product.barcode_image.url }}" alt="{% trans 'Barcode' %}" style="width:100%;max-width:280px;max-height:80px;object-fit:contain;margin-bottom:16px">
+        {% else %}
+          <div class="text-muted mb-3" style="font-size:0.825rem">{% trans "No barcode image" %}</div>
+        {% endif %}
+        <div>
+          <div class="info-label mb-1">{% trans "Current Stock" %}</div>
+          {% if current_stock > 0 %}
+            <span class="badge bg-success" style="font-size:0.875rem;padding:6px 14px">{{ current_stock|floatformat:"0" }}</span>
+          {% else %}
+            <span class="badge bg-danger" style="font-size:0.875rem;padding:6px 14px">{% trans "Out of Stock" %}</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

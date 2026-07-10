@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ t.Report }}</title>
+  <style>
+    {% if lang == "bn" %}
+      {% if bengali_font_b64 %}
+      /* PDF mode — font embedded as base64, no network needed */
+      @font-face {
+        font-family: 'NotoSansBengali';
+        src: url('{{ bengali_font_b64 }}') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+      }
+      {% elif not is_pdf %}
+      /* Browser preview only — Google Fonts loaded by browser, NOT by WeasyPrint */
+      @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali&display=swap');
+      @font-face {
+        font-family: 'NotoSansBengali';
+        src: url('https://fonts.gstatic.com/s/notosansbengali/v20/Cn-SJsCGWQxOjaGwMQ6fIiMywrNJIky6nvd8BjzVMvJx2mcSPVFpVEqE-6KmsolImrTpgA.woff2') format('woff2');
+        font-weight: normal;
+        font-style: normal;
+      }
+      {% endif %}
+      /* If is_pdf=True and no font cached — PDF shows boxes but does NOT crash */
+    {% endif %}
+
+    body {
+      margin: 30px;
+      color: #333;
+      background: #fff;
+      {% if lang == "bn" %}
+      font-family: 'NotoSansBengali', 'Noto Sans Bengali', Arial, sans-serif;
+      font-size: 13px;
+      line-height: 1.8;
+      {% else %}
+      font-family: Arial, 'Segoe UI', sans-serif;
+      font-size: 12px;
+      line-height: 1.4;
+      {% endif %}
+    }
+
+    .report-header {
+      text-align: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #ddd;
+    }
+    .report-header img {
+      max-height: 70px;
+      max-width: 200px;
+      display: block;
+      margin: 0 auto 10px auto;
+    }
+    .report-header h1 { font-size: 20px; font-weight: 700; color: #2c3e50; margin: 4px 0; }
+    .report-header h3 { font-size: 13px; font-weight: 400; color: #666; margin: 2px 0; }
+
+    .report-info { text-align: center; margin-bottom: 20px; }
+    .report-info h2 { font-size: 16px; font-weight: 700; color: #2c3e50; margin-bottom: 6px; }
+    .report-meta { font-size: 11px; color: #666; }
+
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+    th, td { padding: 8px 12px; border: 1px solid #ddd; text-align: left; }
+    th { background-color: #f0f4f8; font-weight: 700; color: #2c3e50; }
+    tr:nth-child(even) { background-color: #f9f9f9; }
+
+    .amount-col { text-align: right; }
+    .paid { color: #28a745; font-weight: 700; }
+    .due  { color: #dc3545; font-weight: 700; }
+    tfoot .totals-row td { font-weight: 700; background-color: #f0f4f8; border-top: 2px solid #aaa; }
+    .no-data { text-align: center; color: #888; padding: 30px; font-style: italic; }
+
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      padding-top: 12px;
+      border-top: 1px solid #eee;
+      font-size: 10px;
+      color: #aaa;
+    }
+    @media print { .footer { display: none !important; } }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="report-header">
+  {% if logo_url %}
+    <img src="{{ logo_url }}" alt="logo">
+  {% endif %}
+  <h1>{{ organization.name }}</h1>
+  {% if organization.address %}<h3>{{ organization.address }}</h3>{% endif %}
+  {% if branch %}<h3>{{ branch.name }}</h3>{% endif %}
+</div>
+
+<!-- TITLE -->
+<div class="report-info">
+  <h2>{{ topic_title }} {{ t.Report }}</h2>
+  <div class="report-meta">
+    {{ t.From }} <strong>{{ start }}</strong>
+    {{ t.to }} <strong>{{ end }}</strong>
+    &bull; {{ t.Generated_on }} {% load i18n %}{% now "DATE_FORMAT" %}
+  </div>
+</div>
+
+<!-- TABLE -->
+{% if rows %}
+<table>
+  <thead>
+    <tr>
+      {% for col in columns %}
+        <th {% if col.is_amount %}class="amount-col"{% endif %}>{{ col.label }}</th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in rows %}
+    <tr>
+      {% for cell in row %}
+        {% if cell.is_paid %}
+          <td class="amount-col paid">{{ cell.value }}</td>
+        {% elif cell.is_due %}
+          <td class="amount-col due">{{ cell.value }}</td>
+        {% elif cell.is_amount %}
+          <td class="amount-col">{{ cell.value }}</td>
+        {% else %}
+          <td>{{ cell.value }}</td>
+        {% endif %}
+      {% endfor %}
+    </tr>
+    {% endfor %}
+  </tbody>
+  {% if totals_row %}
+  <tfoot>
+    <tr class="totals-row">
+      {% for cell in totals_row %}
+        {% if cell.is_paid %}
+          <td class="amount-col paid">{{ cell.value|floatformat:2 }}</td>
+        {% elif cell.is_due %}
+          <td class="amount-col due">{{ cell.value|floatformat:2 }}</td>
+        {% elif cell.is_amount %}
+          <td class="amount-col">{{ cell.value|floatformat:2 }}</td>
+        {% elif forloop.first %}
+          <td><strong>{{ t.Total }}</strong></td>
+        {% else %}
+          <td></td>
+        {% endif %}
+      {% endfor %}
+    </tr>
+  </tfoot>
+  {% endif %}
+</table>
+{% else %}
+<p class="no-data">{{ t.No_records }}</p>
+{% endif %}
+
+<!-- FOOTER: hidden in PDF -->
+{% if not is_pdf %}
+<div class="footer">
+  <form method="post" action="{% url 'download_report' %}">
+    {% csrf_token %}
+    <input type="hidden" name="start_date" value="{{ start|date:'Y-m-d' }}">
+    <input type="hidden" name="end_date"   value="{{ end|date:'Y-m-d' }}">
+    <input type="hidden" name="topic"      value="{{ topic }}">
+    <button type="submit">{{ t.Download_PDF }}</button>
+  </form>
+  <a href="{% url 'report_form' %}">{{ t.Back_to_Form }}</a>
+</div>
+{% endif %}
+
+</body>
+</html>

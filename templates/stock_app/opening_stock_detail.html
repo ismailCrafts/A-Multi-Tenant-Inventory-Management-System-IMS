@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Opening Stock Detail" %} — IMS{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><span class="header-icon"><i class="fas fa-list"></i></span>{% trans "Opening Stock Detail" %}</h1>
+</div>
+<div class="ims-card" style="max-width:600px">
+  <div class="ims-card-header"><h4>{% trans "Opening Stock Details" %}</h4></div>
+  <div class="ims-card-body">
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">{% trans "Date" %}</div><div class="info-value">{{ opening_stock.date|date:"Y-m-d" }}</div></div>
+      <div class="info-item"><div class="info-label">{% trans "Product" %}</div><div class="info-value">{{ opening_stock.product.name }}</div></div>
+      <div class="info-item"><div class="info-label">{% trans "Category" %}</div><div class="info-value">{{ opening_stock.category.name }}</div></div>
+      <div class="info-item"><div class="info-label">{% trans "Product Group" %}</div><div class="info-value">{{ opening_stock.product_group.name }}</div></div>
+      <div class="info-item"><div class="info-label">{% trans "Brand" %}</div><div class="info-value">{{ opening_stock.brand.name }}</div></div>
+      <div class="info-item"><div class="info-label">{% trans "Stock" %}</div><div class="info-value fw-semibold" style="font-size:1.1rem">{{ opening_stock.stock|floatformat:"0" }}</div></div>
+
+      {# Created timestamp and creator #}
+      <div class="info-item">
+        <div class="info-label">{% trans "Created" %}</div>
+        <div class="info-value text-muted">
+          {% if opening_stock.created_at %}
+            {{ opening_stock.created_at|date:"M d, Y" }}
+          {% else %}
+            —
+          {% endif %}
+          {% if opening_stock.created_by %}
+            &nbsp;·&nbsp;
+            <strong>{{ opening_stock.created_by.get_full_name|default:opening_stock.created_by.username }}</strong>
+          {% endif %}
+        </div>
+      </div>
+
+      {# Single sentence: show last updated at (date only) by (user) if updated, otherwise show created at/by #}
+      <div class="info-item">
+        <div class="info-label">{% trans "Record" %}</div>
+        <div class="info-value text-muted">
+          {% if opening_stock.updated_at or opening_stock.updated_by %}
+            {% trans "Last updated at" %} 
+            {% if opening_stock.updated_at %}
+              {{ opening_stock.updated_at|date:"M d, Y" }}
+            {% else %}
+              —
+            {% endif %}
+            {% if opening_stock.updated_by %}
+              &nbsp;{% trans "by" %}&nbsp;<strong>{{ opening_stock.updated_by.get_full_name|default:opening_stock.updated_by.username }}</strong>
+            {% endif %}
+          {% else %}
+            {% trans "Created at" %} 
+            {% if opening_stock.created_at %}
+              {{ opening_stock.created_at|date:"M d, Y" }}
+            {% else %}
+              —
+            {% endif %}
+            {% if opening_stock.created_by %}
+              &nbsp;{% trans "by" %}&nbsp;<strong>{{ opening_stock.created_by.get_full_name|default:opening_stock.created_by.username }}</strong>
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="ims-card-footer">
+    <a href="{% url 'view_opening_stock' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> {% trans "Back" %}</a>
+  </div>
+</div>
+{% endblock %}

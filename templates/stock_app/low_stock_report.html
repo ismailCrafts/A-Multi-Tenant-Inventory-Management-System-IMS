@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Low Stock Report" %} — IMS{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><span class="header-icon" style="background:var(--clr-warning-light);color:var(--clr-warning)"><i class="fas fa-triangle-exclamation"></i></span>{% trans "Low Stock Items" %}</h1>
+</div>
+{% if low_stock_products %}
+<div class="ims-card">
+  <div class="ims-table-wrap">
+    <table class="table table-hover">
+      <thead><tr><th>#</th><th>{% trans "Product" %}</th><th class="text-end">{% trans "Current Stock" %}</th><th class="text-end">{% trans "Threshold" %}</th><th>{% trans "Status" %}</th></tr></thead>
+      <tbody>
+        {% for item in low_stock_products %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td class="fw-medium">{{ item.product.name }}</td>
+          <td class="text-end">
+            {% if item.current_stock == 0 %}
+              <span style="color:var(--clr-danger);font-weight:600">{{ item.current_stock }}</span>
+            {% else %}
+              <span style="color:var(--clr-warning);font-weight:600">{{ item.current_stock }}</span>
+            {% endif %}
+          </td>
+          <td class="text-end text-muted">{{ item.threshold }}</td>
+          <td>
+            {% if item.current_stock == 0 %}
+              <span class="badge bg-danger">{% trans "Out of Stock" %}</span>
+            {% else %}
+              <span class="badge bg-warning">{% trans "Low Stock" %}</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="empty-state">
+  <i class="fas fa-check-circle empty-state-icon" style="color:var(--clr-success)"></i>
+  <h5>{% trans "All products are above threshold" %} 🎉</h5>
+  <p>{% trans "No low stock items found." %}</p>
+</div>
+{% endif %}
+{% endblock %}

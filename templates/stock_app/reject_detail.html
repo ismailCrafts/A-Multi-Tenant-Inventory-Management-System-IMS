@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Reject Detail" %} — IMS{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><span class="header-icon"><i class="fas fa-ban"></i></span>{% trans "Product Reject Detail" %}</h1>
+</div>
+<div class="ims-card" style="max-width:600px">
+  <div class="ims-card-header"><h4>{% trans "Reject Details" %}</h4></div>
+  <div class="ims-card-body">
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">{% trans "Date" %}</div><div class="info-value">{{ reject.date|date:"Y-m-d" }}</div></div>
+      <div class="info-item"><div class="info-label">{% trans "Product" %}</div><div class="info-value">{{ reject.product.name }}</div></div>
+      <div class="info-item"><div class="info-label">{% trans "Quantity" %}</div><div class="info-value fw-semibold">{{ reject.quantity|floatformat:"0" }}</div></div>
+      <div class="info-item"><div class="info-label">{% trans "Reason" %}</div><div class="info-value"><span class="badge bg-warning">{{ reject.get_reason_display }}</span></div></div>
+      <div class="info-item"><div class="info-label">{% trans "Purchase" %}</div><div class="info-value">{% if reject.purchase %}{{ reject.purchase.purchase_code }}{% else %}—{% endif %}</div></div>
+      <div class="info-item" style="grid-column:1/-1"><div class="info-label">{% trans "Narration" %}</div><div class="info-value">{{ reject.narration|default:"—" }}</div></div>
+
+      {# Created timestamp and creator #}
+      <div class="info-item">
+        <div class="info-label">{% trans "Created" %}</div>
+        <div class="info-value text-muted">
+          {% if reject.created_at %}
+            {{ reject.created_at|date:"M d, Y" }}
+          {% else %}
+            —
+          {% endif %}
+          {% if reject.created_by %}
+            &nbsp;·&nbsp;
+            <strong>{{ reject.created_by.get_full_name|default:reject.created_by.username }}</strong>
+          {% endif %}
+        </div>
+      </div>
+
+      {# Single sentence: show last updated at (date only) by (user) if updated, otherwise show created at/by #}
+      <div class="info-item">
+        <div class="info-label">{% trans "Record" %}</div>
+        <div class="info-value text-muted">
+          {% if reject.updated_at or reject.updated_by %}
+            {% trans "Last updated at" %} 
+            {% if reject.updated_at %}
+              {{ reject.updated_at|date:"M d, Y" }}
+            {% else %}
+              —
+            {% endif %}
+            {% if reject.updated_by %}
+              &nbsp;{% trans "by" %}&nbsp;<strong>{{ reject.updated_by.get_full_name|default:reject.updated_by.username }}</strong>
+            {% endif %}
+          {% else %}
+            {% trans "Created at" %} 
+            {% if reject.created_at %}
+              {{ reject.created_at|date:"M d, Y" }}
+            {% else %}
+              —
+            {% endif %}
+            {% if reject.created_by %}
+              &nbsp;{% trans "by" %}&nbsp;<strong>{{ reject.created_by.get_full_name|default:reject.created_by.username }}</strong>
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="ims-card-footer">
+    <a href="{% url 'view_reject' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> {% trans "Back" %}</a>
+  </div>
+</div>
+{% endblock %}

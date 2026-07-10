@@ -1,0 +1,294 @@
+{% load static %}
+{% load i18n static %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% trans "IMS" %}{% endblock %}</title>
+
+    <!-- Bootstrap & FontAwesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- IMS Design System -->
+    <link rel="stylesheet" href="{% static 'css/ims/design.css' %}">
+    <link rel="stylesheet" href="{% static 'css/ims/base.css' %}">
+
+    {% block extra_head %}{% endblock %}
+    <script>(function(){var t=localStorage.getItem('ims-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+</head>
+<body>
+
+    <!-- ── Sidebar ──────────────────────────────────────────── -->
+    <nav class="sidebar" id="sidebar" aria-label="{% trans 'Main navigation' %}">
+
+        <!-- Brand -->
+        <a href="{% url 'profile' %}" class="sidebar-header text-decoration-none" title="{% trans 'Profile' %}">
+            <div class="brand-icon">
+                <i class="fas fa-boxes" aria-hidden="true"></i>
+            </div>
+            <span class="sidebar-text">IMS</span>
+        </a>
+
+        <!-- Toggle -->
+        <button class="sidebar-toggle btn btn-link" onclick="toggleSidebar()" aria-label="{% trans 'Toggle sidebar' %}">
+            <i class="fas fa-bars" aria-hidden="true"></i>
+        </button>
+
+        <!-- Products -->
+        <div class="sidebar-section">
+            <a class="sidebar-section-toggle" data-bs-toggle="collapse" href="#productMenu" role="button" aria-expanded="false" aria-controls="productMenu">
+                <i class="fas fa-box" aria-hidden="true"></i>
+                <span class="sidebar-text">{% trans "Products" %}</span>
+                <i class="fas fa-chevron-down" aria-hidden="true"></i>
+            </a>
+            <div class="collapse" id="productMenu">
+                <a href="{% url 'view_category' %}" class="submenu" title="{% trans 'Categories' %}">
+                    <i class="fas fa-th-large" aria-hidden="true"></i>
+                    <span class="sidebar-text">{% trans "Categories" %}</span>
+                </a>
+                <a href="{% url 'view_brand' %}" class="submenu" title="{% trans 'Brands' %}">
+                    <i class="fa-solid fa-building-columns" aria-hidden="true"></i>
+                    <span class="sidebar-text">{% trans "Brands" %}</span>
+                </a>
+                <a href="{% url 'view_productgroup' %}" class="submenu" title="{% trans 'Product Groups' %}">
+                    <i class="fas fa-layer-group" aria-hidden="true"></i>
+                    <span class="sidebar-text">{% trans "Product Groups" %}</span>
+                </a>
+                <a href="{% url 'view_product' %}" class="submenu" title="{% trans 'All Products' %}">
+                    <i class="fas fa-plus-circle" aria-hidden="true"></i>
+                    <span class="sidebar-text">{% trans "Products" %}</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Stock -->
+        <div class="sidebar-section">
+            <a class="sidebar-section-toggle" data-bs-toggle="collapse" href="#stockMenu" role="button" aria-expanded="false" aria-controls="stockMenu">
+                <i class="fas fa-warehouse" aria-hidden="true"></i>
+                <span class="sidebar-text">{% trans "Stock" %}</span>
+                <i class="fas fa-chevron-down" aria-hidden="true"></i>
+            </a>
+            <div class="collapse" id="stockMenu">
+                <a href="{% url 'view_opening_stock' %}" class="submenu">
+                    <i class="fas fa-list" aria-hidden="true"></i>
+                    <span class="sidebar-text">{% trans "Opening Stock" %}</span>
+                </a>
+                <a href="{% url 'view_purchase' %}" class="submenu">
+                    <i class="fas fa-receipt" aria-hidden="true"></i>
+                    <span class="sidebar-text">{% trans "Purchases" %}</span>
+                </a>
+                <a href="{% url 'view_sale' %}" class="submenu">
+                    <i class="fas fa-shopping-cart" aria-hidden="true"></i>
+                    <span class="sidebar-text">{% trans "Sales" %}</span>
+                </a>
+                <a href="{% url 'view_purchase_return' %}" class="submenu">
+                    <i class="fas fa-undo-alt" aria-hidden="true"></i>
+                    <span class="sidebar-text">{% trans "Purchase Returns" %}</span>
+                </a>
+                <a href="{% url 'view_sale_return' %}" class="submenu">
+                    <i class="fas fa-undo" aria-hidden="true"></i>
+                    <span class="sidebar-text">{% trans "Sale Returns" %}</span>
+                </a>
+                <a href="{% url 'view_reject' %}" class="submenu">
+                    <i class="fas fa-ban" aria-hidden="true"></i>
+                    <span class="sidebar-text">{% trans "Product Rejects" %}</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- People -->
+        <div class="sidebar-section">
+            <a class="sidebar-section-toggle" data-bs-toggle="collapse" href="#personMenu" role="button" aria-expanded="false" aria-controls="personMenu">
+                <i class="fas fa-users" aria-hidden="true"></i>
+                <span class="sidebar-text">{% trans "People" %}</span>
+                <i class="fas fa-chevron-down" aria-hidden="true"></i>
+            </a>
+            <div class="collapse" id="personMenu">
+                <a href="{% url 'customer_list' %}" class="submenu">
+                    <i class="fas fa-user-tag" aria-hidden="true"></i>
+                    <span class="sidebar-text">{% trans "Customers" %}</span>
+                </a>
+                <a href="{% url 'customer_create' %}" class="submenu">
+                    <i class="fas fa-user-plus" aria-hidden="true"></i>
+                    <span class="sidebar-text">{% trans "Add Customer" %}</span>
+                </a>
+                <a href="{% url 'supplier_list' %}" class="submenu">
+                    <i class="fas fa-truck" aria-hidden="true"></i>
+                    <span class="sidebar-text">{% trans "Suppliers" %}</span>
+                </a>
+                <a href="{% url 'supplier_create' %}" class="submenu">
+                    <i class="fas fa-user-plus" aria-hidden="true"></i>
+                    <span class="sidebar-text">{% trans "Add Supplier" %}</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Reports -->
+        <div class="sidebar-section">
+            <a class="sidebar-section-toggle" data-bs-toggle="collapse" href="#reportMenu" role="button" aria-expanded="false" aria-controls="reportMenu">
+                <i class="fas fa-file-alt" aria-hidden="true"></i>
+                <span class="sidebar-text">{% trans "Reports" %}</span>
+                <i class="fas fa-chevron-down" aria-hidden="true"></i>
+            </a>
+            <div class="collapse" id="reportMenu">
+                <a href="{% url 'report_form' %}" class="submenu">
+                    <i class="fas fa-chart-bar" aria-hidden="true"></i>
+                    <span class="sidebar-text">{% trans "Generate Report" %}</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Low Stock -->
+        <!--<div class="sidebar-section">-->
+        <!--    <a class="sidebar-section-toggle" data-bs-toggle="collapse" href="#lowstockMenu" role="button" aria-expanded="false" aria-controls="lowstockMenu">-->
+        <!--        <i class="fas fa-triangle-exclamation" aria-hidden="true"></i>-->
+        <!--        <span class="sidebar-text">{% trans "Low Stock" %}</span>-->
+        <!--        <i class="fas fa-chevron-down" aria-hidden="true"></i>-->
+        <!--    </a>-->
+        <!--    <div class="collapse" id="lowstockMenu">-->
+        <!--        <a href="{% url 'low_stock_report' %}" class="submenu">-->
+        <!--            <i class="fas fa-box-open" aria-hidden="true"></i>-->
+        <!--            <span class="sidebar-text">{% trans "Low Stock Items" %}</span>-->
+        <!--        </a>-->
+        <!--    </div>-->
+        <!--</div>-->
+
+        <!-- Profile -->
+        <div class="sidebar-profile-section mt-auto">
+            <a href="{% url 'profile' %}" class="sidebar-link" title="{% trans 'Profile' %}">
+                <i class="fas fa-user-circle" aria-hidden="true"></i>
+                <span class="sidebar-text">{% trans "Profile" %}</span>
+            </a>
+        </div>
+
+    </nav>
+
+    <!-- Mobile overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()" aria-hidden="true"></div>
+
+    <!-- Notifications -->
+    <div class="notification-container" aria-live="polite">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-warning alert-dismissible fade show notification" role="alert">
+                    <i class="fas fa-circle-exclamation" aria-hidden="true"></i>
+                    {% blocktrans %}{{ message }}{% endblocktrans %}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{% trans 'Close' %}"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Main Content -->
+    <main class="content" role="main">
+        <!-- Mobile top bar -->
+        <div class="mobile-topbar" id="mobileTopbar" aria-label="{% trans 'Mobile navigation bar' %}">
+            <button class="mobile-menu-btn" onclick="openMobileSidebar()" aria-label="{% trans 'Open menu' %}">
+                <i class="fas fa-bars" aria-hidden="true"></i>
+            </button>
+            <span class="mobile-title">
+                <span class="brand-dot"></span>
+                IMS
+            </span>
+        </div>
+
+        {% block content %}{% endblock %}
+    </main>
+
+    {% if request.LANGUAGE_CODE == "bn" %}
+        <script src="{% static 'js/avro.min.js' %}"></script>
+        <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            try {
+                document.querySelectorAll("input[type='text'], textarea").forEach(function(el) {
+                    if (el.id) Avro.Phonetic.bind(el.id);
+                });
+            } catch (e) { console.warn("Avro binding failed:", e); }
+        });
+        </script>
+    {% endif %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ── Desktop toggle (original logic preserved) ──
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('collapsed');
+            const texts = document.querySelectorAll('.sidebar-text');
+            texts.forEach(t => t.style.display = sidebar.classList.contains('collapsed') ? 'none' : 'inline');
+            const submenus = document.querySelectorAll('.submenu');
+            submenus.forEach(s => {
+                if (sidebar.classList.contains('collapsed')) s.classList.add('justify-content-center');
+                else s.classList.remove('justify-content-center');
+            });
+        }
+
+        // ── Mobile sidebar ──
+        function isMobile() { return window.innerWidth <= 768; }
+
+        function openMobileSidebar() {
+            if (!isMobile()) return;
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.add('mobile-open');
+            sidebar.classList.remove('collapsed');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMobileSidebar() {
+            if (!isMobile()) return;
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.remove('mobile-open');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (isMobile()) {
+                document.querySelectorAll('.sidebar a:not(.sidebar-section-toggle)').forEach(function(link) {
+                    link.addEventListener('click', closeMobileSidebar);
+                });
+            }
+
+            // Tooltips
+            const tooltipElements = document.querySelectorAll('[title]');
+            tooltipElements.forEach(el => new bootstrap.Tooltip(el));
+
+            // Auto-dismiss notifications
+            const notifications = document.querySelectorAll('.notification');
+            notifications.forEach(n => {
+                setTimeout(() => {
+                    const bsAlert = bootstrap.Alert.getOrCreateInstance(n);
+                    bsAlert.close();
+                }, 5000);
+            });
+
+            // Wrap bare tables in table-responsive
+            document.querySelectorAll('.content table:not(.no-responsive)').forEach(function(table) {
+                if (!table.closest('.table-responsive')) {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'table-responsive';
+                    table.parentNode.insertBefore(wrapper, table);
+                    wrapper.appendChild(table);
+                }
+            });
+        });
+
+        window.addEventListener('resize', function() {
+            if (!isMobile()) {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('sidebarOverlay');
+                sidebar.classList.remove('mobile-open');
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

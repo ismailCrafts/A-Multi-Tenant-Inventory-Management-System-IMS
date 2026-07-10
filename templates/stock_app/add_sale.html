@@ -1,0 +1,597 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Add Sale" %}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4">{% trans "Add Sale" %}</h2>
+
+    <form method="POST" id="sale-form">
+        {% csrf_token %}
+
+        <!-- Header fields -->
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label for="date" class="form-label">{% trans "Date" %} <span class="text-danger">*</span></label>
+                <input type="date" id="date" name="date" class="form-control" required value="{{ today }}">
+            </div>
+            <div class="col-md-4">
+                <label for="sale_code" class="form-label">{% trans "Sale Code" %}</label>
+                <input type="text" id="sale_code" name="sale_code" class="form-control" value="{{ next_code }}" readonly>
+            </div>
+            <div class="col-md-4">
+                <label for="customer_identifier" class="form-label">
+                    {% trans "Customer Code/Mobile" %} <span class="text-danger">*</span>
+                </label>
+                <input type="text" id="customer_identifier" name="customer_identifier" class="form-control" required>
+            </div>
+        </div>
+
+        <!-- Auto-filled customer fields -->
+        <div id="customer_fields" class="row mb-3">
+            <div class="col-md-3">
+                <label for="customer_name" class="form-label">{% trans "Customer Name" %}</label>
+                <input type="text" id="customer_name" name="customer_name" class="form-control" readonly>
+            </div>
+            <div class="col-md-3">
+                <label for="customer_mobile" class="form-label">{% trans "Customer Mobile" %}</label>
+                <input type="text" id="customer_mobile" name="customer_mobile" class="form-control" readonly>
+            </div>
+            <div class="col-md-3">
+                <label for="customer_email" class="form-label">{% trans "Customer Email" %}</label>
+                <input type="email" id="customer_email" name="customer_email" class="form-control" readonly>
+            </div>
+            <div class="col-md-3">
+                <label for="customer_address" class="form-label">{% trans "Customer Address" %}</label>
+                <input type="text" id="customer_address" name="customer_address" class="form-control" readonly>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="narration" class="form-label">{% trans "Narration" %}</label>
+            <textarea id="narration" name="narration" class="form-control" rows="2"></textarea>
+        </div>
+
+        <!-- Items -->
+        <h5 class="mt-4">{% trans "Sale Items" %}</h5>
+
+        <!-- Live stock info banner -->
+        <div class="alert alert-info py-2 mb-3" id="live-stock-banner">
+            <small>
+                <strong>Live Stock:</strong>
+                The number shown beside each product is the <strong>real-time available stock</strong>
+                after accounting for other users currently filling forms. It updates every 15 seconds.
+            </small>
+        </div>
+
+        <div id="items-container">
+            <div class="row mb-3 item-row align-items-end">
+                <!-- Barcode -->
+                <div class="col-md-2">
+                    <label class="form-label">{% trans "Scan Barcode" %}</label>
+                    <input type="text" name="row_barcode[]" class="form-control row-barcode"
+                           placeholder="{% trans 'Scan barcode' %}">
+                </div>
+
+                <!-- Product -->
+                <div class="col-md-3">
+                    <label class="form-label">
+                        {% trans "Product" %}
+                        <small class="text-muted">({% trans "Available" %})</small>
+                    </label>
+                    <select name="product_ids[]" class="form-control product-select" required>
+                        <option value="">{% trans "-- Select Product --" %}</option>
+                        {% for product in products %}
+                        <option value="{{ product.id }}"
+                                data-stock="{{ product.current_stock }}">
+                            {{ product.name }} ({{ product.current_stock }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Unit Price -->
+                <div class="col-md-2">
+                    <label class="form-label">{% trans "Unit Price" %}</label>
+                    <input type="number" name="unit_prices[]" step="0.01"
+                           placeholder="{% trans 'Unit Price' %}"
+                           class="form-control" required>
+                </div>
+
+                <!-- Quantity with live badge -->
+                <div class="col-md-2">
+                    <label class="form-label">{% trans "Quantity" %}</label>
+                    <div class="input-group">
+                        <input type="number" name="quantities[]" step="0.01" min="0"
+                               placeholder="{% trans 'Quantity' %}"
+                               class="form-control qty-input" required>
+                        <span class="input-group-text stock-badge bg-light text-muted"
+                              title="Available stock" style="font-size:0.78rem; min-width:54px; justify-content:center;">
+                            —
+                        </span>
+                    </div>
+                    <div class="stock-warning text-danger small mt-1" style="display:none;"></div>
+                </div>
+
+                <!-- Remove button -->
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-outline-danger w-100 remove-item">
+                        {% trans "Remove" %}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <button type="button" class="btn btn-secondary mb-3" id="add-item">
+            {% trans "Add Item" %}
+        </button>
+
+        <!-- Payment summary -->
+        <h5 class="mt-4">{% trans "Payment summary" %}</h5>
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label for="total_amount" class="form-label">{% trans "Total Amount" %}</label>
+                <input type="number" id="total_amount" name="total_amount" class="form-control" readonly>
+            </div>
+            <div class="col-md-4">
+                <label for="paid_amount" class="form-label">{% trans "Paid Amount" %}</label>
+                <input type="number" id="paid_amount" name="paid_amount" class="form-control" step="0.01">
+            </div>
+            <div class="col-md-4">
+                <label for="due_amount" class="form-label">{% trans "Due Amount" %}</label>
+                <input type="number" id="due_amount" name="due_amount" class="form-control" readonly>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <button type="submit" class="btn btn-primary" id="save-btn">
+                {% trans "Save Sale" %}
+            </button>
+            <a href="{% url 'view_sale' %}" class="btn btn-outline-secondary" id="cancel-btn">
+                {% trans "Cancel" %}
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// ================================================================
+// FIXED LIVE STOCK RESERVATION SYSTEM WITH LIVE BADGE UPDATES
+// ================================================================
+
+const CSRF = document.querySelector('[name=csrfmiddlewaretoken]').value;
+const RESERVE_URL = '/stock/reserve/';
+const AVAIL_URL = '/stock/available/';
+const LOOKUP_URL = '/stock/lookup/';
+
+// ---- Debounce helper ----
+function debounce(fn, ms) {
+    let t;
+    return function(...a) {
+        clearTimeout(t);
+        t = setTimeout(() => fn.apply(this, a), ms);
+    };
+}
+
+// ---- FIXED: Update badge with correct color based on stock level ----
+function setBadge(row, avail) {
+    const badge = row.querySelector('.stock-badge');
+    if (!badge) return;
+    
+    // Convert to number and handle '—' case
+    let stockNum;
+    if (avail === '—' || avail === null || avail === undefined) {
+        stockNum = 0;
+        badge.textContent = '—';
+    } else {
+        stockNum = parseInt(avail) || 0;
+        badge.textContent = stockNum;
+    }
+    
+    // Remove all existing color classes
+    badge.className = 'input-group-text';
+    
+    // Add appropriate color class based on stock level
+    if (stockNum === 0) {
+        badge.classList.add('bg-danger', 'text-white');
+    } else if (stockNum <= 5) {
+        badge.classList.add('bg-warning', 'text-dark');
+    } else {
+        badge.classList.add('bg-success', 'text-white');
+    }
+    
+    // Add fixed styling
+    badge.style.fontSize = '0.78rem';
+    badge.style.minWidth = '54px';
+    badge.style.justifyContent = 'center';
+    
+    // Update title
+    badge.title = stockNum === 0 ? 'Out of stock!' : `${stockNum} units available`;
+}
+
+// ---- Update all product selects with new stock values ----
+function refreshOptionText(productId, avail) {
+    document.querySelectorAll('.product-select').forEach(sel => {
+        const opt = [...sel.options].find(o => o.value === String(productId));
+        if (opt) {
+            // Extract product name without the old stock number
+            const base = opt.textContent.replace(/\s*\(\d+\)\s*$/, '').trim();
+            opt.textContent = `${base} (${avail})`;
+        }
+    });
+}
+
+// ---- Fetch available stock with cache busting ----
+async function getAvailableStock(productId) {
+    try {
+        const r = await fetch(`${RESERVE_URL}?product_id=${productId}&_=${Date.now()}`);
+        if (!r.ok) {
+            console.error('Failed to fetch stock:', r.status);
+            return null;
+        }
+        const data = await r.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching stock:', error);
+        return null;
+    }
+}
+
+// ---- Reserve stock with better error handling ----
+async function reserveStock(productId, qty) {
+    try {
+        const r = await fetch(RESERVE_URL, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json', 
+                'X-CSRFToken': CSRF 
+            },
+            body: JSON.stringify({ 
+                product_id: productId, 
+                quantity: qty,
+                _t: Date.now()
+            }),
+        });
+        
+        const data = await r.json();
+        return data;
+    } catch (error) {
+        console.error('Error reserving stock:', error);
+        return null;
+    }
+}
+
+// ---- Release reservation ----
+async function releaseStock(productId) {
+    if (!productId) return;
+    try {
+        await fetch(RESERVE_URL, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json', 
+                'X-CSRFToken': CSRF 
+            },
+            body: JSON.stringify({ 
+                product_id: productId, 
+                quantity: 0,
+                _t: Date.now()
+            }),
+        });
+    } catch (error) {
+        console.error('Error releasing stock:', error);
+    }
+}
+
+// ---- Handle product selection ----
+async function onProductChange(row) {
+    const sel = row.querySelector('.product-select');
+    const qtyInput = row.querySelector('.qty-input');
+    const warn = row.querySelector('.stock-warning');
+    
+    if (!sel || !sel.value) {
+        setBadge(row, '—');
+        return;
+    }
+    
+    // Clear quantity and warning
+    if (qtyInput) qtyInput.value = '';
+    if (warn) {
+        warn.style.display = 'none';
+        warn.textContent = '';
+    }
+    
+    const info = await getAvailableStock(sel.value);
+    if (info) {
+        setBadge(row, info.available_stock);
+        refreshOptionText(sel.value, info.available_stock);
+    }
+}
+
+// ---- Handle quantity change with debounce ----
+const onQtyChange = debounce(async function(row) {
+    const sel = row.querySelector('.product-select');
+    const qtyInput = row.querySelector('.qty-input');
+    const warn = row.querySelector('.stock-warning');
+    
+    if (!sel || !sel.value || !qtyInput) return;
+
+    const productId = sel.value;
+    const qty = parseFloat(qtyInput.value) || 0;
+
+    if (qty <= 0) {
+        await releaseStock(productId);
+        const info = await getAvailableStock(productId);
+        if (info) { 
+            setBadge(row, info.available_stock); 
+            refreshOptionText(productId, info.available_stock); 
+        }
+        recalcTotals();
+        return;
+    }
+
+    const result = await reserveStock(productId, qty);
+    if (!result) return;
+
+    // Update badge with new available stock
+    setBadge(row, result.available_stock);
+    refreshOptionText(productId, result.available_stock);
+
+    if (!result.success) {
+        // Exceeded — warn and cap
+        if (warn) {
+            warn.style.display = 'block';
+            warn.textContent = `⚠️ ${result.message}`;
+        }
+        qtyInput.value = result.your_reservation;
+    } else {
+        if (warn) { 
+            warn.style.display = 'none'; 
+            warn.textContent = ''; 
+        }
+    }
+
+    recalcTotals();
+}, 400);
+
+// ---- Barcode scan ----
+// Handles both barcode scanners (Enter key) and manual product code entry (Enter key)
+// Fires on Enter keydown so user never needs to click away from the field
+async function handleBarcodeInput(inputEl) {
+    const code = inputEl.value.trim();
+    if (!code) return;
+
+    try {
+        const r = await fetch(`${LOOKUP_URL}?barcode=${encodeURIComponent(code)}&_=${Date.now()}`);
+        const data = await r.json();
+
+        if (!r.ok || data.error) {
+            alert('{% trans "Product not found" %}');
+            return;
+        }
+
+        const row = inputEl.closest('.item-row');
+        const sel = row.querySelector('.product-select');
+        const priceInput = row.querySelector('input[name="unit_prices[]"]');
+
+        const avail = data.available_stock !== undefined ? data.available_stock : data.current_stock;
+
+        // Add/update option in this row's select
+        let opt = [...sel.options].find(o => o.value === String(data.id));
+        if (!opt) {
+            opt = document.createElement('option');
+            opt.value = data.id;
+            sel.appendChild(opt);
+        }
+        opt.textContent = `${data.name} (${avail})`;
+        sel.value = String(data.id);
+
+        // Autofill price
+        if (priceInput) priceInput.value = data.suggested_price || '';
+
+        // Update badge and fetch live reservation info
+        setBadge(row, avail);
+
+        // Trigger reservation check for the now-selected product
+        await onProductChange(row);
+
+        recalcTotals();
+
+        // Move focus to quantity for fast entry
+        const qtyInput = row.querySelector('.qty-input');
+        if (qtyInput) qtyInput.focus();
+
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+// Fire on Enter key — works for both barcode scanners and manual product code typing
+document.addEventListener('keydown', function(e) {
+    if (e.key !== 'Enter') return;
+    if (!e.target.classList.contains('row-barcode')) return;
+    e.preventDefault();
+    handleBarcodeInput(e.target);
+});
+
+// Also fire on change (blur) as fallback — e.g. user tabs out of the field
+document.addEventListener('change', function(e) {
+    if (!e.target.classList.contains('row-barcode')) return;
+    handleBarcodeInput(e.target);
+});
+
+// ---- Product select change ----
+document.addEventListener('change', async function(e) {
+    if (e.target.classList.contains('product-select')) {
+        await onProductChange(e.target.closest('.item-row'));
+    }
+});
+
+// ---- Quantity input ----
+document.addEventListener('input', function(e) {
+    if (e.target.classList.contains('qty-input')) {
+        onQtyChange(e.target.closest('.item-row'));
+    }
+    if (e.target.name === 'unit_prices[]' || e.target.id === 'paid_amount') {
+        recalcTotals();
+    }
+});
+
+// ---- Add row ----
+document.getElementById('add-item').addEventListener('click', function() {
+    const container = document.getElementById('items-container');
+    const tmpl = container.querySelector('.item-row');
+    const newRow = tmpl.cloneNode(true);
+    
+    // Clear all inputs
+    newRow.querySelectorAll('input').forEach(i => i.value = '');
+    newRow.querySelector('.product-select').selectedIndex = 0;
+    
+    // Reset badge
+    const badge = newRow.querySelector('.stock-badge');
+    if (badge) { 
+        badge.textContent = '—'; 
+        badge.className = 'input-group-text bg-light text-muted'; 
+    }
+    
+    // Reset warning
+    const warn = newRow.querySelector('.stock-warning');
+    if (warn) { 
+        warn.style.display = 'none'; 
+        warn.textContent = ''; 
+    }
+    
+    container.appendChild(newRow);
+    recalcTotals();
+});
+
+// ---- Remove row ----
+document.addEventListener('click', async function(e) {
+    if (!e.target.classList.contains('remove-item')) return;
+    
+    const rows = document.querySelectorAll('.item-row');
+    if (rows.length <= 1) return;
+    
+    const row = e.target.closest('.item-row');
+    const sel = row.querySelector('.product-select');
+    
+    if (sel && sel.value) {
+        await releaseStock(sel.value);
+        const info = await getAvailableStock(sel.value);
+        if (info) {
+            refreshOptionText(sel.value, info.available_stock);
+        }
+    }
+    
+    row.remove();
+    recalcTotals();
+});
+
+// ---- Customer lookup ----
+document.getElementById("customer_identifier")?.addEventListener("blur", function() {
+    const id = this.value;
+    if (!id) return;
+    fetch(`/customer/lookup/?identifier=${encodeURIComponent(id)}`)
+        .then(r => r.json())
+        .then(d => {
+            if (d.error) { 
+                alert(d.error); 
+                return; 
+            }
+            document.getElementById("customer_name").value = d.name || '';
+            document.getElementById("customer_mobile").value = d.mobile || '';
+            document.getElementById("customer_email").value = d.email || '';
+            document.getElementById("customer_address").value = d.address || '';
+        }).catch(console.error);
+});
+
+// ---- Totals ----
+function recalcTotals() {
+    let total = 0;
+    document.querySelectorAll('#items-container .item-row').forEach(row => {
+        const qty = parseFloat(row.querySelector('.qty-input')?.value) || 0;
+        const price = parseFloat(row.querySelector('input[name="unit_prices[]"]')?.value) || 0;
+        total += qty * price;
+    });
+    
+    const tf = document.getElementById('total_amount');
+    if (tf) tf.value = total.toFixed(2);
+    
+    const pf = document.getElementById('paid_amount');
+    const df = document.getElementById('due_amount');
+    if (df) df.value = (total - (parseFloat(pf?.value) || 0)).toFixed(2);
+}
+
+// ---- Cancel: release all reservations ----
+document.getElementById('cancel-btn')?.addEventListener('click', async function(e) {
+    e.preventDefault();
+    const href = this.href;
+    
+    const releases = [...document.querySelectorAll('.item-row')]
+        .map(r => r.querySelector('.product-select'))
+        .filter(s => s && s.value)
+        .map(s => releaseStock(s.value));
+    
+    await Promise.all(releases);
+    window.location.href = href;
+});
+
+// ---- Page unload: best-effort release ----
+window.addEventListener('beforeunload', function() {
+    document.querySelectorAll('.item-row').forEach(row => {
+        const sel = row.querySelector('.product-select');
+        if (!sel || !sel.value) return;
+        const body = JSON.stringify({ product_id: sel.value, quantity: 0, _t: Date.now() });
+        if (navigator.sendBeacon) {
+            navigator.sendBeacon(RESERVE_URL, new Blob([body], { type: 'application/json' }));
+        }
+    });
+});
+
+// ---- FIXED: Background poll every 10 seconds with immediate badge updates ----
+async function pollStocks() {
+    const ids = [...new Set(
+        [...document.querySelectorAll('.product-select')]
+            .map(s => s.value).filter(Boolean)
+    )];
+    
+    if (!ids.length) return;
+    
+    try {
+        const r = await fetch(`${AVAIL_URL}?product_ids=${ids.join(',')}&_=${Date.now()}`);
+        if (!r.ok) return;
+        
+        const data = await r.json();
+        const stocks = data.stocks;
+        
+        // Update each row's badge
+        document.querySelectorAll('.item-row').forEach(row => {
+            const sel = row.querySelector('.product-select');
+            if (!sel || !sel.value) return;
+            
+            const avail = stocks[sel.value];
+            if (avail !== undefined) {
+                setBadge(row, avail);
+                refreshOptionText(sel.value, avail);
+            }
+        });
+    } catch (error) {
+        console.error('Poll error:', error);
+    }
+}
+
+// Poll every 10 seconds instead of 15 for more responsive updates
+setInterval(pollStocks, 10000);
+
+// Initial poll after 1 second
+setTimeout(pollStocks, 1000);
+
+// ---- Init ----
+document.addEventListener('DOMContentLoaded', function() {
+    recalcTotals();
+    // Initial stock check for any pre-selected products
+    pollStocks();
+});
+</script>
+{% endblock %}

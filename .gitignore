@@ -1,0 +1,42 @@
+# Virtual environments
+venv/
+env/
+IMSenv/
+
+# Python cache
+*.pyc
+__pycache__/
+
+# Database
+db.sqlite3
+
+# Media & uploads
+media/
+uploads/
+tmp/
+
+# Static files
+staticfiles/
+
+# Environment variables
+.env
+
+# IDE settings
+.vscode/
+.idea/
+
+# Logs
+*.log
+django_errors.log
+stderr.log
+error_logs.jsonl
+
+# Build artifacts
+*.egg-info/
+
+# Locale compiled files
+locale/
+*.mo
+
+# Fonts
+*.woff2

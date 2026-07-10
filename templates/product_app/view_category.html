@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% block title %}{% trans "Categories" %} — IMS{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><span class="header-icon"><i class="fas fa-th-large"></i></span>{% trans "Categories" %}</h1>
+  <a href="{% url 'add_category' %}" class="btn btn-primary"><i class="fas fa-plus"></i> {% trans "Add Category" %}</a>
+</div>
+{% if categories %}
+<div class="ims-card"><div class="ims-table-wrap">
+  <table class="table table-hover">
+    <thead><tr>
+      <th style="width:48px">#</th>
+      <th>{% trans "Name" %}</th>
+      <th>{% trans "Description" %}</th>
+    </tr></thead>
+    <tbody>
+      {% for category in categories %}
+      <tr>
+        <td class="text-muted">{{ forloop.counter }}</td>
+        <td><a href="{% url 'category_detail' category.name %}" class="fw-medium">{{ category.name }}</a></td>
+        <td class="text-muted">{{ category.description|default:"—" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div></div>
+{% else %}
+<div class="empty-state">
+  <i class="fas fa-th-large empty-state-icon"></i>
+  <h5>{% trans "No categories yet" %}</h5>
+  <a href="{% url 'add_category' %}" class="btn btn-primary"><i class="fas fa-plus"></i> {% trans "Add one" %}</a>
+</div>
+{% endif %}
+{% endblock %}

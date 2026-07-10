@@ -1,0 +1,11 @@
+{% extends "admin/index.html" %}
+
+{% block content %}
+  {{ block.super }}
+  <div class="module">
+    <h2>Error Diagnostics</h2>
+    <ul>
+      <li><a href="{% url 'error_lookup' %}">Error Lookup by Correlation ID</a></li>
+    </ul>
+  </div>
+{% endblock %}

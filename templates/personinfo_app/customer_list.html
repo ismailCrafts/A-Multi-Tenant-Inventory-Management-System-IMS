@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Customers" %} — IMS{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1><span class="header-icon"><i class="fas fa-user-tag"></i></span>{% trans "Customers" %}</h1>
+    <a href="{% url 'customer_create' %}" class="btn btn-primary"><i class="fas fa-plus"></i> {% trans "Add Customer" %}</a>
+</div>
+{% if customers %}
+<div class="ims-card"><div class="ims-table-wrap">
+    <table class="table table-hover">
+        <thead><tr>
+            <th style="width:48px">#</th>
+            <th>{% trans "Code" %}</th>
+            <th>{% trans "Name" %}</th>
+            <th>{% trans "Mobile" %}</th>
+            <th>{% trans "Email" %}</th>
+            <th>{% trans "Address" %}</th>
+        </tr></thead>
+        <tbody>
+            {% for customer in customers %}
+            <tr>
+                <td class="text-muted">{{ forloop.counter }}</td>
+                <td><a href="{% url 'customer_detail' customer.pk %}" class="fw-medium text-mono">{{ customer.code }}</a></td>
+                <td class="fw-medium">{{ customer.name }}</td>
+                <td>{{ customer.mobile }}</td>
+                <td>{{ customer.email|default:"—" }}</td>
+                <td class="text-muted">{{ customer.address|default:"—" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div></div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-user-tag empty-state-icon"></i>
+    <h5>{% trans "No customers yet" %}</h5>
+    <p>{% trans "Get started by adding your first customer." %}</p>
+    <a href="{% url 'customer_create' %}" class="btn btn-primary"><i class="fas fa-plus"></i> {% trans "Add Customer" %}</a>
+</div>
+{% endif %}
+{% endblock %}

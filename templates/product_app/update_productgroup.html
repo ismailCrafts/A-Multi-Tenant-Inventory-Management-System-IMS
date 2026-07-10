@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% block title %}{% trans "Update Product Group" %} — IMS{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><span class="header-icon"><i class="fas fa-pen"></i></span>{% trans "Update Product Group" %}</h1>
+  <a href="{% url 'view_productgroup' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> {% trans "Back" %}</a>
+</div>
+<div class="ims-card" style="max-width:560px">
+  <div class="ims-card-body">
+    <form action="{% url 'update_productgroup' productgroup.name %}" method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label for="productgroup_name" class="form-label">{% trans "Group Name" %} <span class="text-danger">*</span></label>
+        <input type="text" id="productgroup_name" name="productgroup_name" class="form-control" required value="{{ productgroup.name }}">
+      </div>
+      <div class="mb-4">
+        <label for="productgroup_description" class="form-label">{% trans "Description" %}</label>
+        <textarea id="productgroup_description" name="productgroup_description" class="form-control" rows="3">{{ productgroup.description }}</textarea>
+      </div>
+      <div class="d-flex gap-3">
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> {% trans "Update Group" %}</button>
+        <a href="{% url 'view_productgroup' %}" class="btn btn-secondary">{% trans "Cancel" %}</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

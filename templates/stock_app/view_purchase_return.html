@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Purchase Returns" %} — IMS{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><span class="header-icon"><i class="fas fa-undo-alt"></i></span>{% trans "Purchase Returns" %}</h1>
+  <a href="{% url 'add_purchase_return' %}" class="btn btn-primary"><i class="fas fa-plus"></i> {% trans "Add Return" %}</a>
+</div>
+{% if returns %}
+<div class="ims-card"><div class="ims-table-wrap">
+  <table class="table table-hover">
+    <thead><tr>
+      <th style="width:48px">#</th>
+      <th>{% trans "Code" %}</th>
+      <th>{% trans "Date" %}</th>
+      <th>{% trans "Supplier" %}</th>
+      <th class="text-end">{% trans "Total" %}</th>
+      <th class="text-end">{% trans "Refund" %}</th>
+      <th class="text-end">{% trans "Due" %}</th>
+    </tr></thead>
+    <tbody>
+      {% for pr in returns %}
+      <tr>
+        <td class="text-muted">{{ forloop.counter }}</td>
+        <td><a href="{% url 'purchase_return_detail' pr.return_code %}" class="fw-medium text-mono">{{ pr.return_code }}</a></td>
+        <td>{{ pr.date|date:"Y-m-d" }}</td>
+        <td>{{ pr.supplier_name }}</td>
+        <td class="text-end">{{ pr.total_amount|floatformat:"-2" }}৳</td>
+        <td class="text-end" style="color:var(--clr-success)">{{ pr.refund_amount|floatformat:"-2" }}৳</td>
+        <td class="text-end" style="color:var(--clr-danger)">{{ pr.due_amount|floatformat:"-2" }}৳</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div></div>
+{% else %}
+<div class="empty-state">
+  <i class="fas fa-undo-alt empty-state-icon"></i>
+  <h5>{% trans "No purchase returns" %}</h5>
+  <a href="{% url 'add_purchase_return' %}" class="btn btn-primary"><i class="fas fa-plus"></i> {% trans "Add" %}</a>
+</div>
+{% endif %}
+{% endblock %}

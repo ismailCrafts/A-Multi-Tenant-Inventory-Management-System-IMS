@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Sales" %} — IMS{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><span class="header-icon"><i class="fas fa-shopping-cart"></i></span>{% trans "Sales" %}</h1>
+  <a href="{% url 'add_sale' %}" class="btn btn-primary"><i class="fas fa-plus"></i> {% trans "Add Sale" %}</a>
+</div>
+{% if sales %}
+<div class="ims-card"><div class="ims-table-wrap">
+  <table class="table table-hover">
+    <thead><tr>
+      <th style="width:48px">#</th>
+      <th>{% trans "Code" %}</th>
+      <th>{% trans "Date" %}</th>
+      <th>{% trans "Customer" %}</th>
+      <th class="text-end">{% trans "Total" %}</th>
+      <th class="text-end">{% trans "Paid" %}</th>
+      <th class="text-end">{% trans "Due" %}</th>
+    </tr></thead>
+    <tbody>
+      {% for sale in sales %}
+      <tr>
+        <td class="text-muted">{{ forloop.counter }}</td>
+        <td><a href="{% url 'sale_detail' sale.sale_code %}" class="fw-medium text-mono">{{ sale.sale_code }}</a></td>
+        <td>{{ sale.date|date:"Y-m-d" }}</td>
+        <td>{{ sale.customer_name|default:"—" }}</td>
+        <td class="text-end">{{ sale.total_amount|floatformat:"-2" }}৳</td>
+        <td class="text-end" style="color:var(--clr-success)">{{ sale.paid_amount|floatformat:"-2" }}৳</td>
+        <td class="text-end" style="color:var(--clr-danger)">{{ sale.due_amount|floatformat:"-2" }}৳</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div></div>
+{% else %}
+<div class="empty-state">
+  <i class="fas fa-shopping-cart empty-state-icon"></i>
+  <h5>{% trans "No sales yet" %}</h5>
+  <a href="{% url 'add_sale' %}" class="btn btn-primary"><i class="fas fa-plus"></i> {% trans "Add Sale" %}</a>
+</div>
+{% endif %}
+{% endblock %}

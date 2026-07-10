@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Opening Stock" %} — IMS{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><span class="header-icon"><i class="fas fa-list"></i></span>{% trans "Opening Stock" %}</h1>
+  <a href="{% url 'add_opening_stock' %}" class="btn btn-primary"><i class="fas fa-plus"></i> {% trans "Add Opening Stock" %}</a>
+</div>
+{% if opening_stocks %}
+<div class="ims-card"><div class="ims-table-wrap">
+  <table class="table table-hover">
+    <thead><tr>
+      <th style="width:48px">#</th>
+      <th>{% trans "Product Code" %}</th>
+      <th>{% trans "Date" %}</th>
+      <th>{% trans "Category" %}</th>
+      <th>{% trans "Group" %}</th>
+      <th>{% trans "Brand" %}</th>
+      <th class="text-end">{% trans "Stock" %}</th>
+    </tr></thead>
+    <tbody>
+      {% for stock in opening_stocks %}
+      <tr>
+        <td class="text-muted">{{ forloop.counter }}</td>
+        <td><a href="{% url 'opening_stock_detail' stock.product.code %}" class="fw-medium text-mono">{{ stock.product.code }}</a></td>
+        <td>{{ stock.date|date:"Y-m-d" }}</td>
+        <td>{{ stock.category.name }}</td>
+        <td>{{ stock.product_group.name }}</td>
+        <td>{{ stock.brand.name }}</td>
+        <td class="text-end fw-medium">{{ stock.stock|floatformat:"0" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div></div>
+{% else %}
+<div class="empty-state">
+  <i class="fas fa-list empty-state-icon"></i>
+  <h5>{% trans "No opening stock entries" %}</h5>
+  <a href="{% url 'add_opening_stock' %}" class="btn btn-primary"><i class="fas fa-plus"></i> {% trans "Add Opening Stock" %}</a>
+</div>
+{% endif %}
+{% endblock %}

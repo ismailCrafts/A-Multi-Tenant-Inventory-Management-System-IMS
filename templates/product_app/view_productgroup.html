@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% block title %}{% trans "Product Groups" %} — IMS{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><span class="header-icon"><i class="fas fa-layer-group"></i></span>{% trans "Product Groups" %}</h1>
+  <a href="{% url 'add_productgroup' %}" class="btn btn-primary"><i class="fas fa-plus"></i> {% trans "Add Product Group" %}</a>
+</div>
+{% if productgroups %}
+<div class="ims-card"><div class="ims-table-wrap">
+  <table class="table table-hover">
+    <thead><tr>
+      <th style="width:48px">#</th>
+      <th>{% trans "Code" %}</th>
+      <th>{% trans "Name" %}</th>
+      <th>{% trans "Category" %}</th>
+      <th>{% trans "Brand" %}</th>
+      <th>{% trans "Description" %}</th>
+    </tr></thead>
+    <tbody>
+      {% for group in productgroups %}
+      <tr>
+        <td class="text-muted">{{ forloop.counter }}</td>
+        <td><a href="{% url 'productgroups_detail' group.name %}" class="fw-medium text-mono">{{ group.code }}</a></td>
+        <td>{{ group.name }}</td>
+        <td>{{ group.category.name }}</td>
+        <td>{{ group.brand.name }}</td>
+        <td class="text-muted">{{ group.description|default:"—" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div></div>
+{% else %}
+<div class="empty-state">
+  <i class="fas fa-layer-group empty-state-icon"></i>
+  <h5>{% trans "No product groups yet" %}</h5>
+  <a href="{% url 'add_productgroup' %}" class="btn btn-primary"><i class="fas fa-plus"></i> {% trans "Add one" %}</a>
+</div>
+{% endif %}
+{% endblock %}

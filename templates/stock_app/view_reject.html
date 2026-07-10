@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Product Rejects" %} — IMS{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><span class="header-icon"><i class="fas fa-ban"></i></span>{% trans "Product Rejects" %}</h1>
+  <a href="{% url 'add_reject' %}" class="btn btn-primary"><i class="fas fa-plus"></i> {% trans "Add Reject" %}</a>
+</div>
+{% if rejects %}
+<div class="ims-card"><div class="ims-table-wrap">
+  <table class="table table-hover">
+    <thead><tr>
+      <th style="width:48px">#</th>
+      <th>{% trans "Code" %}</th>
+      <th>{% trans "Date" %}</th>
+      <th>{% trans "Product" %}</th>
+      <th class="text-end">{% trans "Qty" %}</th>
+      <th>{% trans "Reason" %}</th>
+      <th>{% trans "Purchase" %}</th>
+    </tr></thead>
+    <tbody>
+      {% for r in rejects %}
+      <tr>
+        <td class="text-muted">{{ forloop.counter }}</td>
+        <td><a href="{% url 'reject_detail' r.reject_code %}" class="fw-medium text-mono">{{ r.reject_code }}</a></td>
+        <td>{{ r.date|date:"Y-m-d" }}</td>
+        <td>{{ r.product.name|default:"—" }}</td>
+        <td class="text-end">{{ r.quantity|floatformat:"0" }}</td>
+        <td><span class="badge bg-warning">{{ r.get_reason_display }}</span></td>
+        <td>{% if r.purchase %}{{ r.purchase.purchase_code }}{% else %}—{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div></div>
+{% else %}
+<div class="empty-state">
+  <i class="fas fa-ban empty-state-icon"></i>
+  <h5>{% trans "No product rejects" %}</h5>
+  <a href="{% url 'add_reject' %}" class="btn btn-primary"><i class="fas fa-plus"></i> {% trans "Add" %}</a>
+</div>
+{% endif %}
+{% endblock %}

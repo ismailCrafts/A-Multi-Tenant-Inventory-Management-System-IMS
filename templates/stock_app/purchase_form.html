@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "New Purchase" %}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3 class="mb-3">{% trans "Add New Purchase" %}</h3>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label>{% trans "Supplier Name" %}</label>
+                <input type="text" name="supplier_name" class="form-control" required>
+            </div>
+            <div class="col-md-3">
+                <label>{% trans "Mobile" %}</label>
+                <input type="text" name="supplier_mobile" class="form-control">
+            </div>
+            <div class="col-md-3">
+                <label>{% trans "Purchase Code" %}</label>
+                <input type="text" name="purchase_code" class="form-control" value="{{ generated_code }}" readonly>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label>{% trans "Supplier Address" %}</label>
+            <textarea name="supplier_address" class="form-control"></textarea>
+        </div>
+
+        <hr>
+        <h5>{% trans "Purchase Items" %}</h5>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>{% trans "Product" %}</th>
+                    <th>{% trans "Qty" %}</th>
+                    <th>{% trans "Unit Price" %}</th>
+                    <th>{% trans "Subtotal" %}</th>
+                </tr>
+            </thead>
+            <tbody id="items-table">
+                <tr>
+                    <td><input type="text" name="product_1" class="form-control"></td>
+                    <td><input type="number" name="qty_1" class="form-control"></td>
+                    <td><input type="number" step="0.01" name="price_1" class="form-control"></td>
+                    <td><input type="number" step="0.01" name="subtotal_1" class="form-control" readonly></td>
+                </tr>
+            </tbody>
+        </table>
+        <button type="button" class="btn btn-sm btn-secondary" id="add-row">+ {% trans "Add Item" %}</button>
+
+        <div class="mt-4 text-end">
+            <button type="submit" class="btn btn-primary">{% trans "Save Purchase" %}</button>
+        </div>
+    </form>
+</div>
+
+{% block extra_js %}
+<script>
+document.getElementById('add-row').addEventListener('click', () => {
+    const table = document.getElementById('items-table');
+    const index = table.rows.length + 1;
+    const row = `
+        <tr>
+            <td><input type="text" name="product_${index}" class="form-control"></td>
+            <td><input type="number" name="qty_${index}" class="form-control"></td>
+            <td><input type="number" step="0.01" name="price_${index}" class="form-control"></td>
+            <td><input type="number" step="0.01" name="subtotal_${index}" class="form-control" readonly></td>
+        </tr>`;
+    table.insertAdjacentHTML('beforeend', row);
+});
+</script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% block title %}{% trans "Update Brand" %} — IMS{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><span class="header-icon"><i class="fas fa-pen"></i></span>{% trans "Update Brand" %}</h1>
+  <a href="{% url 'view_brand' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> {% trans "Back" %}</a>
+</div>
+<div class="ims-card" style="max-width:600px">
+  <div class="ims-card-body">
+    <form action="{% url 'update_brand' brand.name %}" method="post">
+      {% csrf_token %}
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label for="new_name" class="form-label">{% trans "Brand Name" %} <span class="text-danger">*</span></label>
+          <input type="text" id="new_name" name="new_name" class="form-control" required value="{{ brand.name }}">
+        </div>
+        <div class="col-md-6">
+          <label for="code" class="form-label">{% trans "Brand Code" %}</label>
+          <input type="text" id="code" name="code" class="form-control" readonly value="{{ brand.code }}">
+        </div>
+      </div>
+      <div class="mb-4">
+        <label for="brand_description" class="form-label">{% trans "Description" %}</label>
+        <textarea id="brand_description" name="brand_description" class="form-control" rows="3">{{ brand.description }}</textarea>
+      </div>
+      <div class="d-flex gap-3">
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> {% trans "Update Brand" %}</button>
+        <a href="{% url 'view_brand' %}" class="btn btn-secondary">{% trans "Cancel" %}</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

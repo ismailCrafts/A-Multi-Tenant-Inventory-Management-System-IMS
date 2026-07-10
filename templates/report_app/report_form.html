@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Generate Report" %} — IMS{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><span class="header-icon"><i class="fas fa-chart-bar"></i></span>{% trans "Generate Report" %}</h1>
+</div>
+<div class="ims-card" style="max-width:640px">
+  <div class="ims-card-body">
+    <form method="POST" action="{% url 'preview_report' %}">
+      {% csrf_token %}
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <label for="start_date" class="form-label">{% trans "Start Date" %} <span class="text-danger">*</span></label>
+          <input type="date" id="start_date" name="start_date" class="form-control" required>
+        </div>
+        <div class="col-md-6">
+          <label for="end_date" class="form-label">{% trans "End Date" %} <span class="text-danger">*</span></label>
+          <input type="date" id="end_date" name="end_date" class="form-control" required>
+        </div>
+        <div class="col-12">
+          <label for="topic" class="form-label">{% trans "Report Topic" %} <span class="text-danger">*</span></label>
+          <select id="topic" name="topic" class="form-control" required>
+            <option value="opening">{% trans "Opening Stock" %}</option>
+            <option value="purchase">{% trans "Purchase" %}</option>
+            <option value="sale">{% trans "Sale" %}</option>
+            <option value="purchase_return">{% trans "Purchase Return" %}</option>
+            <option value="sale_return">{% trans "Sale Return" %}</option>
+            <option value="reject">{% trans "Product Reject" %}</option>
+          </select>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-lg">
+        <i class="fas fa-eye"></i> {% trans "Preview Report" %}
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

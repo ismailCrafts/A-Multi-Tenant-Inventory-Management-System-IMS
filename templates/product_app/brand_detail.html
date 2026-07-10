@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{{ brand.name }} — {% trans "Brand" %}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><span class="header-icon"><i class="fas fa-building-columns"></i></span>{{ brand.name }}</h1>
+</div>
+<div class="ims-card" style="max-width:640px">
+  <div class="ims-card-header">
+    <h4>{% trans "Brand Details" %}</h4>
+    <span class="badge bg-secondary text-mono">{{ brand.code }}</span>
+  </div>
+  <div class="ims-card-body">
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">{% trans "Name" %}</div><div class="info-value">{{ brand.name }}</div></div>
+      <div class="info-item"><div class="info-label">{% trans "Code" %}</div><div class="info-value mono">{{ brand.code }}</div></div>
+      <div class="info-item" style="grid-column:1/-1"><div class="info-label">{% trans "Description" %}</div><div class="info-value">{{ brand.description|default:"—" }}</div></div>
+
+      {# Created timestamp and creator #}
+      <div class="info-item">
+        <div class="info-label">{% trans "Created" %}</div>
+        <div class="info-value text-muted">
+          {% if brand.created_at %}
+            {{ brand.created_at|date:"M d, Y" }}
+          {% else %}
+            —
+          {% endif %}
+          {% if brand.created_by %}
+            &nbsp;·&nbsp;
+            <strong>{{ brand.created_by.get_full_name|default:brand.created_by.username }}</strong>
+          {% endif %}
+        </div>
+      </div>
+
+      {# Single sentence: show last updated at (time) by (user) if updated, otherwise show created at/by #}
+      <div class="info-item">
+        <div class="info-label">{% trans "Record" %}</div>
+        <div class="info-value text-muted">
+          {% if brand.updated_at or brand.updated_by %}
+            {% trans "Last updated at" %} 
+            {% if brand.updated_at %}
+              {{ brand.updated_at|date:"M d, Y" }}
+            {% else %}
+              —
+            {% endif %}
+            {% if brand.updated_by %}
+              &nbsp;{% trans "by" %}&nbsp;<strong>{{ brand.updated_by.get_full_name|default:brand.updated_by.username }}</strong>
+            {% endif %}
+          {% else %}
+            {% trans "Created at" %} 
+            {% if brand.created_at %}
+              {{ brand.created_at|date:"M d, Y" }}
+            {% else %}
+              —
+            {% endif %}
+            {% if brand.created_by %}
+              &nbsp;{% trans "by" %}&nbsp;<strong>{{ brand.created_by.get_full_name|default:brand.created_by.username }}</strong>
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="ims-card-footer">
+    <a href="{% url 'update_brand' brand.name %}" class="btn btn-warning"><i class="fas fa-pen"></i> {% trans "Update" %}</a>
+    <a href="{% url 'delete_brand' brand.name %}" class="btn btn-danger" onclick="return confirm('{% trans "Delete this brand?" %}')"><i class="fas fa-trash"></i> {% trans "Delete" %}</a>
+    <a href="{% url 'view_brand' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> {% trans "Back" %}</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Add Opening Stock" %} — IMS{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><span class="header-icon"><i class="fas fa-plus"></i></span>{% trans "Add Opening Stock" %}</h1>
+  
+</div>
+<div class="ims-card" style="max-width:800px">
+  <div class="ims-card-body">
+    <form method="POST">
+      {% csrf_token %}
+      <div class="row g-3 mb-3">
+        <div class="col-md-4">
+          <label for="date" class="form-label">{% trans "Date" %} <span class="text-danger">*</span></label>
+          <input type="date" id="date" name="date" class="form-control" required value="{{ today }}">
+        </div>
+        <div class="col-md-4">
+          <label for="category" class="form-label">{% trans "Category" %} <span class="text-danger">*</span></label>
+          <select id="category" name="category" class="form-control" required>
+            <option value="">{% trans "-- Select Category --" %}</option>
+            {% for category in categories %}<option value="{{ category.id }}">{{ category.name }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label for="product_group" class="form-label">{% trans "Product Group" %} <span class="text-danger">*</span></label>
+          <select id="product_group" name="product_group" class="form-control" required>
+            <option value="">{% trans "-- Select Product Group --" %}</option>
+            {% for group in productgroups %}<option value="{{ group.id }}">{{ group.name }} ({{ group.brand.name }})</option>{% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="row g-3 mb-3">
+        <div class="col-md-4">
+          <label for="brand" class="form-label">{% trans "Brand" %} <span class="text-danger">*</span></label>
+          <select id="brand" name="brand" class="form-control" required>
+            <option value="">{% trans "-- Select Brand --" %}</option>
+            {% for brand in brands %}<option value="{{ brand.id }}">{{ brand.name }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label for="product" class="form-label">{% trans "Product" %} <span class="text-danger">*</span></label>
+          <select id="product" name="product" class="form-control" required>
+            <option value="">{% trans "-- Select Product --" %}</option>
+            {% for product in products %}<option value="{{ product.id }}">{{ product.name }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label for="stock" class="form-label">{% trans "Opening Stock Quantity" %} <span class="text-danger">*</span></label>
+          <input type="number" step="0.01" id="stock" name="stock" class="form-control" required>
+        </div>
+      </div>
+      <div class="d-flex gap-3">
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> {% trans "Add Opening Stock" %}</button>
+        <a href="{% url 'view_opening_stock' %}" class="btn btn-secondary">{% trans "Cancel" %}</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

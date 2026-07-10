@@ -1,0 +1,156 @@
+{% load static %}
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% trans "Sign Up - IMS" %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/ims/auth.css' %}">
+</head>
+<body>
+
+<div class="signup-page-wrapper">
+    <div class="notification-container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <div class="signup-card">
+        <div class="card-header">
+            <div class="logo-container">
+                <div class="logo"><i class="fas fa-boxes"></i></div>
+                <div class="logo-text">
+                    <div class="main">IMS</div>
+                    <div class="sub">{% trans "Join our inventory management platform" %}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-heading">
+            <h2 class="heading-with-line">{% trans "Create Your Account" %}</h2>
+        </div>
+
+        <div class="card-body">
+            <form method="POST" action="{% url 'user_registration' %}">
+                {% csrf_token %}
+
+                <div class="form-row-2">
+                    <div class="form-column">
+                        <label for="username" class="form-label">{% trans "Username" %}</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                            <input type="text" class="form-control" id="username" name="username"
+                                   placeholder="{% trans 'Enter username' %}" required>
+                        </div>
+                        <div class="form-text">{% trans "Choose a unique username" %}</div>
+                    </div>
+
+                    <div class="form-column">
+                        <label for="email" class="form-label">{% trans "Email Address" %}</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                            <input type="email" class="form-control" id="email" name="email"
+                                   placeholder="{% trans 'Enter email' %}" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row-2">
+                    <div class="form-column">
+                        <label for="organization" class="form-label">{% trans "Organization" %}</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-building"></i></span>
+                            <input type="text" class="form-control" id="organization" name="organization"
+                                   placeholder="{% trans 'Enter organization' %}" required>
+                        </div>
+                    </div>
+
+                    <div class="form-column">
+                        <label for="branch" class="form-label">{% trans "Branch" %} <span style="font-weight:400;color:var(--clr-muted)">({% trans "Optional" %})</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-code-branch"></i></span>
+                            <input type="text" class="form-control" id="branch" name="branch"
+                                   placeholder="{% trans 'Enter branch' %}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="role" class="form-label">{% trans "Role" %}</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
+                        <select class="form-control" id="role" name="role">
+                            <option value="employee" selected>{% trans "Employee" %}</option>
+                            <option value="manager">{% trans "Manager" %}</option>
+                            <option value="admin">{% trans "Admin" %}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row-2">
+                    <div class="form-column">
+                        <label for="password" class="form-label">{% trans "Password" %}</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            <input type="password" class="form-control" id="password" name="password"
+                                   placeholder="{% trans 'Create a strong password' %}" required>
+                            <button class="btn btn-outline-secondary password-toggle" type="button" id="togglePassword">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-column">
+                        <label for="confirmPassword" class="form-label">{% trans "Confirm Password" %}</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            <input type="password" class="form-control" id="confirmPassword" name="confirm_password"
+                                   placeholder="{% trans 'Confirm your password' %}" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions mt-2">
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-user-plus"></i>
+                            {% trans "Create Account" %}
+                        </button>
+                    </div>
+                    <div class="login-link">
+                        {% trans "Already have an account?" %} <a href="{% url 'login' %}">{% trans "Sign In" %}</a>
+                    </div>
+                    <div class="org-request-link">
+                        {% trans "New organization?" %} <a href="{% url 'create_organization' %}">{% trans "Request Organization" %}</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.getElementById('togglePassword').addEventListener('click', function() {
+    const passwordInput = document.getElementById('password');
+    const icon = this.querySelector('i');
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+});
+</script>
+</body>
+</html>

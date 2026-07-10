@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{{ productgroup.name }} — {% trans "Product Group" %}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><span class="header-icon"><i class="fas fa-layer-group"></i></span>{{ productgroup.name }}</h1>
+</div>
+<div class="ims-card" style="max-width:640px">
+  <div class="ims-card-header">
+    <h4>{% trans "Product Group Details" %}</h4>
+    <span class="badge bg-secondary text-mono">{{ productgroup.code }}</span>
+  </div>
+  <div class="ims-card-body">
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">{% trans "Name" %}</div><div class="info-value">{{ productgroup.name }}</div></div>
+      <div class="info-item"><div class="info-label">{% trans "Code" %}</div><div class="info-value mono">{{ productgroup.code }}</div></div>
+      <div class="info-item" style="grid-column:1/-1"><div class="info-label">{% trans "Description" %}</div><div class="info-value">{{ productgroup.description|default:"—" }}</div></div>
+
+      {# Created timestamp and creator #}
+      <div class="info-item">
+        <div class="info-label">{% trans "Created" %}</div>
+        <div class="info-value text-muted">
+          {% if productgroup.created_at %}
+            {{ productgroup.created_at|date:"M d, Y" }}
+          {% else %}
+            —
+          {% endif %}
+          {% if productgroup.created_by %}
+            &nbsp;·&nbsp;
+            <strong>{{ productgroup.created_by.get_full_name|default:productgroup.created_by.username }}</strong>
+          {% endif %}
+        </div>
+      </div>
+
+      {# Single sentence: show last updated at (date only) by (user) if updated, otherwise show created at/by #}
+      <div class="info-item">
+        <div class="info-label">{% trans "Record" %}</div>
+        <div class="info-value text-muted">
+          {% if productgroup.updated_at or productgroup.updated_by %}
+            {% trans "Last updated at" %} 
+            {% if productgroup.updated_at %}
+              {{ productgroup.updated_at|date:"M d, Y" }}
+            {% else %}
+              —
+            {% endif %}
+            {% if productgroup.updated_by %}
+              &nbsp;{% trans "by" %}&nbsp;<strong>{{ productgroup.updated_by.get_full_name|default:productgroup.updated_by.username }}</strong>
+            {% endif %}
+          {% else %}
+            {% trans "Created at" %} 
+            {% if productgroup.created_at %}
+              {{ productgroup.created_at|date:"M d, Y" }}
+            {% else %}
+              —
+            {% endif %}
+            {% if productgroup.created_by %}
+              &nbsp;{% trans "by" %}&nbsp;<strong>{{ productgroup.created_by.get_full_name|default:productgroup.created_by.username }}</strong>
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="ims-card-footer">
+    <a href="{% url 'update_productgroup' productgroup.name %}" class="btn btn-warning"><i class="fas fa-pen"></i> {% trans "Update" %}</a>
+    <a href="{% url 'delete_productgroup' productgroup.name %}" class="btn btn-danger" onclick="return confirm('{% trans "Delete this product group?" %}')"><i class="fas fa-trash"></i> {% trans "Delete" %}</a>
+    <a href="{% url 'view_productgroup' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> {% trans "Back" %}</a>
+  </div>
+</div>
+{% endblock %}

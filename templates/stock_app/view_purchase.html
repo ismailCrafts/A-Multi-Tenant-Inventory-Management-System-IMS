@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Purchases" %} — IMS{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><span class="header-icon"><i class="fas fa-receipt"></i></span>{% trans "Purchases" %}</h1>
+  <a href="{% url 'add_purchase' %}" class="btn btn-primary"><i class="fas fa-plus"></i> {% trans "Add Purchase" %}</a>
+</div>
+{% if purchases %}
+<div class="ims-card"><div class="ims-table-wrap">
+  <table class="table table-hover">
+    <thead><tr>
+      <th style="width:48px">#</th>
+      <th>{% trans "Code" %}</th>
+      <th>{% trans "Date" %}</th>
+      <th>{% trans "Supplier" %}</th>
+      <th class="text-end">{% trans "Total" %}</th>
+      <th class="text-end">{% trans "Paid" %}</th>
+      <th class="text-end">{% trans "Due" %}</th>
+    </tr></thead>
+    <tbody>
+      {% for purchase in purchases %}
+      <tr>
+        <td class="text-muted">{{ forloop.counter }}</td>
+        <td><a href="{% url 'purchase_detail' purchase.purchase_code %}" class="fw-medium text-mono">{{ purchase.purchase_code }}</a></td>
+        <td>{{ purchase.date|date:"Y-m-d" }}</td>
+        <td>{{ purchase.supplier_name|default:"—" }}</td>
+        <td class="text-end">{{ purchase.total_amount|floatformat:"-2" }}৳</td>
+        <td class="text-end" style="color:var(--clr-success)">{{ purchase.paid_amount|floatformat:"-2" }}৳</td>
+        <td class="text-end" style="color:var(--clr-danger)">{{ purchase.due_amount|floatformat:"-2" }}৳</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div></div>
+{% else %}
+<div class="empty-state">
+  <i class="fas fa-receipt empty-state-icon"></i>
+  <h5>{% trans "No purchases yet" %}</h5>
+  <a href="{% url 'add_purchase' %}" class="btn btn-primary"><i class="fas fa-plus"></i> {% trans "Add Purchase" %}</a>
+</div>
+{% endif %}
+{% endblock %}
