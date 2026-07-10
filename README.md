@@ -252,7 +252,6 @@ EMAIL_HOST_USER=
 EMAIL_HOST_PASSWORD=
 ```
 
-> Never commit a real `.env` file — add it to `.gitignore`.
 
 ---
 
@@ -283,7 +282,7 @@ For application images, please refer to the images/ folder, where files are orga
 ---
 ## License
 
-Copyright 2026 Ismail Koni
+Copyright 2026 Md Ismail 
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this project except in compliance with the License.
